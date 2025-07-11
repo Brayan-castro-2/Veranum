@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Búsqueda - Hoteles VERANUM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', // Azul primario
+                        secondary: '#60A5FA', // Azul secundario
+                        dark: '#1F2937', // Texto oscuro
+                        light: '#F3F4F6', // Fondo claro
+                        accent: '#EF4444', // Acento/errores
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                        veranumDarkGreen: '#388E3C', // Verde oscuro para texto/botones
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .room-card {
+            display: flex;
+            background-color: theme('colors.white');
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            overflow: hidden;
+            border: 1px solid theme('colors.gray.200');
+        }
+        .room-card-image {
+            width: 40%; /* Adjust as needed */
+            flex-shrink: 0;
+            object-fit: cover;
+        }
+        .room-card-details {
+            padding: 1.5rem; /* p-6 */
+            flex-grow: 1;
+        }
+        @media (max-width: 768px) {
+            .room-card {
+                flex-direction: column;
+            }
+            .room-card-image {
+                width: 100%;
+                height: 200px; /* Fixed height for small screens */
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark">
+
+    <header class="bg-white shadow-md p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://placehold.co/100x40/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-10 w-auto mr-4 rounded-md">
+                <h1 class="text-2xl font-bold text-veranumDarkGreen">Hoteles VERANUM</h1>
+            </div>
+            <ul class="flex space-x-6">
+                <li><a href="index.html" class="text-gray-700 hover:text-veranumGreen font-medium">Inicio</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Hoteles</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Promociones</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Centro de Eventos</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Contacto</a></li>
+                <li><a href="login.html" class="text-veranumGreen hover:text-veranumDarkGreen font-bold px-3 py-1 border border-veranumGreen rounded-md transition duration-150">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-veranumDarkGreen mb-6">Habitaciones Disponibles</h2>
+
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Tu Búsqueda:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-gray-700">
+                <div><span class="font-medium">Check-in:</span> <span id="displayCheckIn">--</span></div>
+                <div><span class="font-medium">Check-out:</span> <span id="displayCheckOut">--</span></div>
+                <div><span class="font-medium">Ubicación:</span> <span id="displayLocation">--</span></div>
+                <div><span class="font-medium">Huéspedes:</span> <span id="displayGuests">--</span></div>
+            </div>
+            <button onclick="window.location.href='index.html'" class="mt-6 bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition duration-150 ease-in-out">
+                Modificar Búsqueda
+            </button>
+        </div>
+
+        <div id="roomListings" class="space-y-8">
+            <!-- Habitaciones se agregarán dinámicamente -->
+        </div>
+
+        <div id="noResultsMessage" class="hidden text-center p-8 bg-white rounded-lg shadow-md text-gray-700">
+            <p class="text-lg font-semibold mb-2">No se encontraron habitaciones para los criterios de búsqueda.</p>
+            <p class="text-sm">Intenta ajustar las fechas, la ubicación o el número de huéspedes.</p>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <div class="mb-4 md:mb-0">
+                <p>&copy; 2025 Hoteles VERANUM. Todos los derechos reservados.</p>
+            </div>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-veranumGreen">Política de Privacidad</a>
+                <a href="#" class="hover:text-veranumGreen">Términos y Condiciones</a>
+                <a href="#" class="hover:text-veranumGreen">Contáctanos</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ROOMS_KEY='VERANUM_ROOMS';
+            const RES_KEY='VERANUM_RESERVATIONS';
+            const getRooms=()=>JSON.parse(localStorage.getItem(ROOMS_KEY)||'[]');
+            const getRes=()=>JSON.parse(localStorage.getItem(RES_KEY)||'[]');
+            const isAvailable=(roomId,from,to)=>{
+                const fromD=new Date(from);const toD=new Date(to);
+                return getRes().filter(r=>r.roomId===roomId).every(r=>{
+                    const rStart=new Date(r.checkIn);const rEnd=new Date(r.checkOut);
+                    return (toD<=rStart)||(fromD>=rEnd);
+                });
+            };
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const checkIn = urlParams.get('checkIn');
+            const checkOut = urlParams.get('checkOut');
+            const location = urlParams.get('location');
+            const guests = urlParams.get('guests');
+
+            document.getElementById('displayCheckIn').textContent = checkIn || '--';
+            document.getElementById('displayCheckOut').textContent = checkOut || '--';
+            document.getElementById('displayLocation').textContent = location ? (location === 'santiago' ? 'Santiago' : 'V Región') : 'Cualquier Hotel';
+            document.getElementById('displayGuests').textContent = guests || '--';
+
+            const roomListings=document.getElementById('roomListings');
+            const noResultsMessage=document.getElementById('noResultsMessage');
+
+            const rooms=getRooms();
+            const available=rooms.filter(r=>{
+                if(location && location!=='' && r.location && r.location!==location) return false;
+                if(checkIn && checkOut){
+                    if(!isAvailable(r.id,checkIn,checkOut)) return false;
+                }
+                if(guests && parseInt(guests)>r.capacity) return false;
+                return true;
+            });
+
+            if(available.length===0){
+                noResultsMessage.classList.remove('hidden');
+                return;
+            }
+
+            available.forEach(r=>{
+                const nightly=`CLP ${r.dailyPrice.toLocaleString('es-CL')}`;
+                const card=`<div class="room-card">
+                    <img src="${r.image||'https://placehold.co/600x400/AEC966/ffffff?text=Habitacion'}" alt="${r.roomNumber}" class="room-card-image">
+                    <div class="room-card-details flex flex-col">
+                        <h3 class="text-2xl font-bold text-veranumDarkGreen mb-2">${r.serviceType} - ${r.hotelName}</h3>
+                        <p class="text-gray-700 mb-4">Habitación ${r.roomNumber} con capacidad para ${r.capacity} personas.</p>
+                        <p class="text-gray-600 text-sm mb-4">Camas: ${r.beds} | Baños: ${r.bathrooms}</p>
+                        <div class="flex justify-between items-end mt-auto">
+                            <span class="text-3xl font-bold text-veranumGreen">${nightly}<span class="text-xl text-gray-600 font-normal">/noche</span></span>
+                            <button class="bg-veranumGreen text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-veranumDarkGreen transition duration-300"
+                                onclick="window.location.href='booking.html?roomId=${r.id}&checkIn=${checkIn||''}&checkOut=${checkOut||''}&price=${r.dailyPrice}&guests=${guests||''}';">
+                                Reservar Ahora
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                roomListings.insertAdjacentHTML('beforeend',card);
+            });
+        });
+    </script>
+</body>
+</html>

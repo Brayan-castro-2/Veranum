@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse - Hoteles VERANUM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', /* Azul primario */
+                        secondary: '#60A5FA', /* Azul secundario */
+                        dark: '#1F2937', /* Texto oscuro */
+                        light: '#F3F4F6', /* Fondo claro */
+                        accent: '#EF4444', /* Acento/errores */
+                        // Colores personalizados para VERANUM, inspirados en hospitalidad
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Fondo con gradiente sutil para la página de registro */
+        .gradient-bg {
+            background: linear-gradient(to right, theme('colors.veranumGreen'), theme('colors.veranumLightGreen'));
+        }
+    </style>
+</head>
+<body class="bg-light flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-8 md:p-12 w-full max-w-md border border-gray-200">
+        <div class="flex justify-center mb-8">
+            <img src="https://placehold.co/150x50/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-16 w-auto rounded-lg">
+        </div>
+
+        <h2 class="text-3xl font-bold text-center text-dark mb-8">Crear una cuenta en VERANUM</h2>
+
+        <form id="registrationForm" class="space-y-6">
+            <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                <input type="text" id="fullName" name="fullName" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                       placeholder="Tu nombre completo">
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" id="email" name="email" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                       placeholder="tu.correo@ejemplo.com">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <div class="mt-1 relative rounded-lg shadow-sm">
+                    <input type="password" id="password" name="password" required
+                           class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm pr-10"
+                           placeholder="Crea tu contraseña">
+                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" id="togglePassword">
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <div>
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                       placeholder="Confirma tu contraseña">
+            </div>
+
+            <button type="submit"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-veranumGreen transition duration-150 ease-in-out">
+                Registrarse
+            </button>
+        </form>
+
+        <p class="mt-8 text-center text-sm text-gray-600">
+            ¿Ya tienes una cuenta?
+            <a href="login.html" class="font-medium text-primary hover:text-secondary">Iniciar Sesión</a>
+        </p>
+
+        <div id="messageBox" class="hidden mt-4 p-3 rounded-lg text-sm text-center" role="alert"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const registrationForm = document.getElementById('registrationForm');
+            const messageBox = document.getElementById('messageBox');
+
+            // Clave de almacenamiento unificada con login y mantenedores
+            const STORAGE_KEY = 'VERANUM_USERS';
+            const LEGACY_KEY = 'VERANUM_REGISTERED_USERS';
+            // Migración: si la clave antigua existe y la nueva aún no, copiar los datos y eliminar la antigua
+            if (localStorage.getItem(LEGACY_KEY) && !localStorage.getItem(STORAGE_KEY)) {
+                localStorage.setItem(STORAGE_KEY, localStorage.getItem(LEGACY_KEY));
+                localStorage.removeItem(LEGACY_KEY);
+            }
+            const getUsers = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+            const saveUsers = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+            // Función para mostrar/ocultar contraseña (compartida con login)
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                // Opcionalmente, actualiza el icono aquí
+            });
+
+            // Función para mostrar mensajes (compartida con login)
+            function showMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
+                if (type === 'error') {
+                    messageBox.classList.add('bg-red-100', 'text-red-700');
+                } else if (type === 'success') {
+                    messageBox.classList.add('bg-green-100', 'text-green-700');
+                } else if (type === 'info') {
+                    messageBox.classList.add('bg-blue-100', 'text-blue-700');
+                }
+                messageBox.classList.remove('hidden');
+            }
+
+            // Manejo del envío del formulario de registro
+            registrationForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+
+                const fullName = document.getElementById('fullName').value.trim();
+                const email = document.getElementById('email').value.trim().toLowerCase();
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                // Validaciones básicas
+                if (!fullName || !email || !password || !confirmPassword) {
+                    showMessage('Por favor, completa todos los campos.', 'error');
+                    return;
+                }
+                if (password !== confirmPassword) {
+                    showMessage('Las contraseñas no coinciden.', 'error');
+                    return;
+                }
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    showMessage('Por favor, ingresa un correo electrónico válido.', 'error');
+                    return;
+                }
+
+                // Comprobar duplicados
+                const users = getUsers();
+                if (users.some(u => u.email === email)) {
+                    showMessage('Ya existe una cuenta con este correo.', 'error');
+                    return;
+                }
+
+                // Guardar
+                const newUser = { id: Date.now(), fullName, email, password };
+                users.push(newUser);
+                saveUsers(users);
+                showMessage('¡Registro exitoso! Redirigiendo al inicio de sesión...', 'success');
+                setTimeout(() => window.location.href = 'pages/login.html', 1000);
+            });
+        });
+    </script>
+</body>
+</html>

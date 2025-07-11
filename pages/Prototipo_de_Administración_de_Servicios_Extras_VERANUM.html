@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Administración de Servicios Extras</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Administración de Servicios Extras VERANUM</h1>
+
+        <!-- Sección para añadir un nuevo servicio extra -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Añadir Nuevo Servicio Extra</h2>
+            <form id="addServiceForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="serviceName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Servicio</label>
+                    <input type="text" id="serviceName" name="serviceName" placeholder="Ej: Gimnasio, Spa, Cancha de Tenis" required>
+                </div>
+                <div>
+                    <label for="dailyCost" class="block text-gray-700 text-sm font-medium mb-2">Costo Diario (CLP)</label>
+                    <input type="number" id="dailyCost" name="dailyCost" min="0" step="100" value="0" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="serviceDescription" class="block text-gray-700 text-sm font-medium mb-2">Descripción del Servicio</label>
+                    <textarea id="serviceDescription" name="serviceDescription" rows="3" placeholder="Breve descripción del servicio y sus características."></textarea>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Guardar Servicio
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección para mostrar la lista de servicios extras -->
+        <div>
+            <h2 class="text-2xl font-semibold text-dark mb-4">Servicios Extras Registrados</h2>
+            <div id="serviceList" class="space-y-4">
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Funciones globales de mensajes
+        window.showMessage = (msg) => {
+            const box = document.getElementById('messageBox');
+            const text = document.getElementById('messageText');
+            if (box && text) { text.innerText = msg; box.classList.remove('hidden'); }
+        };
+        window.hideMessage = () => document.getElementById('messageBox')?.classList.add('hidden');
+
+        // --- Persistencia de Servicios Extras ---
+        const STORAGE_KEY = 'VERANUM_SERVICES';
+        const getServices = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const saveServices = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+
+        const renderService = (svc) => {
+            const list = document.getElementById('serviceList');
+            if (!list) return;
+            const html = `
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center mb-4" data-id="${svc.id}">
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">${svc.serviceName}</h3>
+                        <p class="text-gray-600 text-sm">Costo Diario: CLP ${svc.dailyCost.toLocaleString('es-CL')}</p>
+                        <p class="text-gray-600 text-xs mt-1">Descripción: ${svc.description || 'Sin descripción.'}</p>
+                    </div>
+                    <button class="edit-svc mt-3 md:mt-0 bg-blue-100 text-primary py-1 px-4 rounded-md text-sm hover:bg-blue-200" data-id="${svc.id}">Editar</button>
+                </div>`;
+            list.insertAdjacentHTML('afterbegin', html);
+        };
+
+        const refreshServiceList = () => {
+            const list=document.getElementById('serviceList');
+            if(list) list.innerHTML='';
+            getServices().forEach(renderService);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshServiceList();
+
+            let editingId=null;
+
+            // Delegado para botón editar
+            document.getElementById('serviceList').addEventListener('click',e=>{
+                const btn=e.target.closest('.edit-svc');
+                if(!btn) return;
+                const id=Number(btn.dataset.id);
+                const svc=getServices().find(s=>s.id===id);
+                if(!svc) return;
+                editingId=id;
+                document.getElementById('serviceName').value=svc.serviceName;
+                document.getElementById('dailyCost').value=svc.dailyCost;
+                document.getElementById('serviceDescription').value=svc.description;
+                window.scrollTo({top:0,behavior:'smooth'});
+            });
+
+            const form = document.getElementById('addServiceForm');
+            if (!form) return;
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const serviceName = document.getElementById('serviceName').value;
+                const dailyCostVal = parseFloat(document.getElementById('dailyCost').value || '0');
+                const description = document.getElementById('serviceDescription').value;
+                if (!serviceName) { window.showMessage('Nombre obligatorio'); return; }
+                const arr = getServices();
+                if(editingId!==null){
+                    const idx=arr.findIndex(s=>s.id===editingId);
+                    if(idx>-1){
+                        arr[idx]={...arr[idx], serviceName, dailyCost: dailyCostVal, description};
+                        saveServices(arr);
+                        window.showMessage(`Servicio "${serviceName}" actualizado.`);
+                        editingId=null;
+                    }
+                }else{
+                    const newSvc={ id: Date.now(), serviceName, dailyCost: dailyCostVal, description };
+                    arr.push(newSvc); saveServices(arr);
+                    window.showMessage(`Servicio "${serviceName}" guardado.`);
+                }
+                refreshServiceList();
+                form.reset();
+            });
+        });
+    </script>
+</body>
+</html>

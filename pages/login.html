@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Hoteles VERANUM</title>
+    <!-- Carga de Tailwind CSS CDN para estilos rápidos y responsivos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', /* Azul primario */
+                        secondary: '#60A5FA', /* Azul secundario */
+                        dark: '#1F2937', /* Texto oscuro */
+                        light: '#F3F4F6', /* Fondo claro */
+                        accent: '#EF4444', /* Acento/errores */
+                        // Colores personalizados para VERANUM, inspirados en hospitalidad
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Fondo con gradiente sutil para la página de login */
+        .gradient-bg {
+            background: linear-gradient(to right, theme('colors.veranumGreen'), theme('colors.veranumLightGreen'));
+        }
+    </style>
+</head>
+<body class="bg-light flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-xl shadow-2xl p-8 md:p-12 w-full max-w-md border border-gray-200">
+        <!-- Logo de VERANUM -->
+        <div class="flex justify-center mb-8">
+            <img src="https://placehold.co/150x50/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-16 w-auto rounded-lg">
+        </div>
+
+        <h2 class="text-3xl font-bold text-center text-dark mb-8">Bienvenido a VERANUM</h2>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico / Usuario</label>
+                <input type="text" id="email" name="email" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                       placeholder="tu.correo@veranum.com" value="admin@veranum.com"> <!-- Valor por defecto para facilidad de prueba -->
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <div class="mt-1 relative rounded-lg shadow-sm">
+                    <input type="password" id="password" name="password" required
+                           class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm pr-10"
+                           placeholder="Ingresa tu contraseña" value="password123"> <!-- Valor por defecto para facilidad de prueba -->
+                    <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" id="togglePassword">
+                        <!-- Ícono de ojo para mostrar/ocultar contraseña -->
+                        <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <a href="#" class="font-medium text-primary hover:text-secondary">¿Olvidaste tu contraseña?</a>
+            </div>
+
+            <button type="submit"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-bold text-white gradient-bg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-veranumGreen transition duration-150 ease-in-out">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <p class="mt-8 text-center text-sm text-gray-600">
+            ¿Eres un cliente nuevo?
+            <a href="../register.html" class="font-medium text-primary hover:text-secondary">Regístrate aquí</a>
+        </p>
+
+        <!-- Contenedor para mensajes de error o éxito, invisible por defecto -->
+        <div id="messageBox" class="hidden mt-4 p-3 rounded-lg text-sm text-center" role="alert"></div>
+    </div>
+
+    <script>
+        // JavaScript para la interactividad del formulario
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            const emailInput = document.getElementById('email'); // Añadir esta línea
+            const loginForm = document.getElementById('loginForm');
+            const messageBox = document.getElementById('messageBox');
+
+            // Clave almacenamiento
+            const STORAGE_KEY='VERANUM_USERS'; // misma clave utilizada en el mantenedor
+            const getUsers=()=>JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+
+            // Función para mostrar/ocultar contraseña
+            togglePassword.addEventListener('click', function () {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                // Aquí podrías cambiar el ícono del ojo si tuvieras dos versiones (abierto/cerrado)
+            });
+
+            // Función para mostrar mensajes en el cuadro de mensajes
+            function showMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
+                if (type === 'error') {
+                    messageBox.classList.add('bg-red-100', 'text-red-700');
+                } else if (type === 'success') {
+                    messageBox.classList.add('bg-green-100', 'text-green-700');
+                } else if (type === 'info') {
+                    messageBox.classList.add('bg-blue-100', 'text-blue-700');
+                }
+                messageBox.classList.remove('hidden');
+            }
+
+            // Manejo del envío del formulario
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Evitar el envío por defecto del formulario
+
+                const email = emailInput.value;
+                const password = passwordInput.value;
+
+                // Simple validación del lado del cliente
+                if (!email || !password) {
+                    showMessage('Por favor, ingresa tu correo/usuario y contraseña.', 'error');
+                    return;
+                }
+
+                showMessage('Iniciando sesión...', 'info');
+
+                try {
+                    // Simular una llamada a la API con un retraso
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+
+                    // Validar contra usuarios almacenados
+                    const users=getUsers();
+                    const user=users.find(u=>u.email===email.toLowerCase() && u.password===password);
+                    if(user){
+                        localStorage.setItem('VERANUM_CURRENT_USER', JSON.stringify(user));
+                        const displayName = user.fullName || user.name || '';
+                        showMessage(`¡Bienvenido ${displayName}! Redirigiendo...`,'success');
+                        setTimeout(()=>window.location.href='dashboard.html',700);
+                    }else{
+                        showMessage('Credenciales incorrectas. Por favor, inténtalo de nuevo.','error');
+                    }
+
+                } catch (error) {
+                    console.error('Error al iniciar sesión:', error);
+                    showMessage('Ocurrió un error al intentar iniciar sesión. Inténtalo más tarde.', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promociones VERANUM - Ofertas Exclusivas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', // Azul primario
+                        secondary: '#60A5FA', // Azul secundario
+                        dark: '#1F2937', // Texto oscuro
+                        light: '#F3F4F6', // Fondo claro
+                        accent: '#EF4444', // Acento/errores
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                        veranumDarkGreen: '#388E3C', // Verde oscuro para texto/botones
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .promo-card {
+            background-color: theme('colors.white');
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            overflow: hidden;
+            border: 1px solid theme('colors.gray.200');
+            display: flex;
+            flex-direction: column;
+        }
+        .promo-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .promo-card-details {
+            padding: 1.5rem; /* p-6 */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark">
+
+    <header class="bg-white shadow-md p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://placehold.co/100x40/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-10 w-auto mr-4 rounded-md">
+                <h1 class="text-2xl font-bold text-veranumDarkGreen">Hoteles VERANUM</h1>
+            </div>
+            <ul class="flex space-x-6">
+                <li><a href="index.html" class="text-gray-700 hover:text-veranumGreen font-medium">Inicio</a></li>
+                <li><a id="navHotels" href="hotels.html" class="text-gray-700 hover:text-veranumGreen font-medium">Hoteles</a></li>
+                <li><a id="navPromos" href="promotions.html" class="text-veranumGreen font-bold border-b-2 border-veranumGreen pb-1">Promociones</a></li>
+                <li><a id="navCenters" href="event_centers.html" class="text-gray-700 hover:text-veranumGreen font-medium">Centro de Eventos</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Contacto</a></li>
+                <li><a href="login.html" class="text-veranumGreen hover:text-veranumDarkGreen font-bold px-3 py-1 border border-veranumGreen rounded-md transition duration-150">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-veranumDarkGreen mb-8 text-center">Nuestras Promociones Exclusivas</h2>
+
+        <div id="promoCardList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- dinámico -->
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <div class="mb-4 md:mb-0">
+                <p>&copy; 2025 Hoteles VERANUM. Todos los derechos reservados.</p>
+            </div>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-veranumGreen">Política de Privacidad</a>
+                <a href="#" class="hover:text-veranumGreen">Términos y Condiciones</a>
+                <a href="#" class="hover:text-veranumGreen">Contáctanos</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            const HOTEL_KEY='VERANUM_HOTELS';
+            const PROMO_KEY='VERANUM_PROMOTIONS';
+            const CENTER_KEY='VERANUM_EVENT_CENTERS';
+
+            const getHotels=()=>JSON.parse(localStorage.getItem(HOTEL_KEY)||'[]');
+            const getPromos=()=>JSON.parse(localStorage.getItem(PROMO_KEY)||'[]');
+            const getCenters=()=>JSON.parse(localStorage.getItem(CENTER_KEY)||'[]');
+
+            const updateNavCounts=()=>{
+                const h=getHotels().length;
+                const p=getPromos().filter(pr=>pr.approved).length;
+                const c=getCenters().length;
+                document.getElementById('navHotels').textContent=`Hoteles (${h})`;
+                document.getElementById('navPromos').textContent=`Promociones (${p})`;
+                document.getElementById('navCenters').textContent=`Centro de Eventos (${c})`;
+            };
+
+            // --- Semilla de datos de ejemplo para promociones (solo si hay menos de 4) ---
+            const ensureSamplePromos = () => {
+                let promos = getPromos();
+                if (promos.length >= 4) return; // ya hay suficientes
+
+                const sample = [
+                    {
+                        id: Date.now(),
+                        promoName: 'Invierno Familiar',
+                        discountType: 'percentage',
+                        discountValue: 20,
+                        validFrom: '2025-06-01',
+                        validTo: '2025-08-31',
+                        appliesToHotel: 'VERANUM Patagonia',
+                        appliesToRoomType: '',
+                        promoDescription: '20% en estadías familiares durante el invierno.',
+                        approved: true
+                    },
+                    {
+                        id: Date.now()+1,
+                        promoName: '2x1 Fines de Semana',
+                        discountType: 'fixed',
+                        discountValue: 50000,
+                        validFrom: '2025-07-01',
+                        validTo: '2025-12-31',
+                        appliesToHotel: 'VERANUM Santiago',
+                        promoDescription: 'Paga una noche y la siguiente es gratis cada fin de semana.',
+                        approved: true
+                    },
+                    {
+                        id: Date.now()+2,
+                        promoName: 'Escapada Spa',
+                        discountType: 'percentage',
+                        discountValue: 15,
+                        validFrom: '2025-09-01',
+                        validTo: '2025-12-15',
+                        appliesToHotel: 'VERANUM V Región',
+                        promoDescription: 'Incluye circuito de spa y late checkout.',
+                        approved: true
+                    },
+                    {
+                        id: Date.now()+3,
+                        promoName: 'Cyber Days 30%',
+                        discountType: 'percentage',
+                        discountValue: 30,
+                        validFrom: '2025-10-01',
+                        validTo: '2025-10-07',
+                        appliesToHotel: 'Todos los hoteles',
+                        promoDescription: 'Oferta limitada durante Cyber Days.',
+                        approved: true
+                    }
+                ];
+                promos = [...promos, ...sample];
+                localStorage.setItem(PROMO_KEY, JSON.stringify(promos));
+            };
+
+            ensureSamplePromos();
+
+            const promoCardList=document.getElementById('promoCardList');
+
+            const renderPromoCard=(p)=>{
+                if(!promoCardList) return;
+                const discountTxt=p.discountType==='percentage'?`${p.discountValue}%`:`${Number(p.discountValue).toLocaleString('es-CL')} CLP`;
+                const img='https://placehold.co/600x400/34C759/ffffff?text=Promo';
+                const html=`
+                    <div class="promo-card">
+                        <img src="${img}" alt="Promoción ${p.promoName}" class="promo-card-image">
+                        <div class="promo-card-details">
+                            <div>
+                                <h3 class="text-2xl font-bold text-veranumDarkGreen mb-2">${p.promoName} - ${discountTxt} OFF</h3>
+                                <p class="text-gray-700 mb-3">Válido del ${p.validFrom} al ${p.validTo}. Aplica a ${p.appliesToHotel}</p>
+                                <p class="text-gray-600 text-sm mb-4">${p.promoDescription||''}</p>
+                            </div>
+                            <button onclick="window.location.href='index.html?location=${encodeURIComponent(p.appliesToHotel)}'"
+                                    class="mt-4 bg-veranumGreen text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-veranumDarkGreen transition duration-300">
+                                Reservar Ahora
+                            </button>
+                        </div>
+                    </div>`;
+                promoCardList.insertAdjacentHTML('beforeend',html);
+            };
+
+            const refreshPromoList=()=>{
+                if(promoCardList) promoCardList.innerHTML='';
+                getPromos().filter(pr=>pr.approved).forEach(renderPromoCard);
+            };
+
+            updateNavCounts();
+            refreshPromoList();
+
+            window.addEventListener('storage',e=>{
+                if([HOTEL_KEY,PROMO_KEY,CENTER_KEY].includes(e.key)) updateNavCounts();
+                if(e.key===PROMO_KEY) refreshPromoList();
+            });
+        });
+    </script>
+</body>
+</html>

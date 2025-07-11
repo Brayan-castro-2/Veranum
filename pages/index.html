@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hoteles VERANUM - Vive una Experiencia Inolvidable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', // Azul primario
+                        secondary: '#60A5FA', // Azul secundario
+                        dark: '#1F2937', // Texto oscuro
+                        light: '#F3F4F6', // Fondo claro
+                        accent: '#EF4444', // Acento/errores
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                        veranumDarkGreen: '#388E3C', // Verde oscuro para texto/botones
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados para fondo de hero section */
+        .hero-bg {
+            background-image: url('https://placehold.co/1920x600/AEC966/ffffff?text=Bienvenido+a+VERANUM'); /* Imagen de fondo para el hero */
+            background-size: cover;
+            background-position: center;
+        }
+        /* Gradiente para el botón de búsqueda */
+        .search-button-gradient {
+            background: linear-gradient(to right, theme('colors.veranumGreen'), theme('colors.veranumLightGreen'));
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark">
+
+    <header class="bg-white shadow-md p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://placehold.co/100x40/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-10 w-auto mr-4 rounded-md">
+                <h1 class="text-2xl font-bold text-veranumDarkGreen">Hoteles VERANUM</h1>
+            </div>
+            <ul class="flex space-x-6">
+                <li><a href="index.html" class="text-veranumGreen font-bold border-b-2 border-veranumGreen pb-1">Inicio</a></li>
+                <li><a id="navHotels" href="hotels.html" class="text-gray-700 hover:text-veranumGreen font-medium">Hoteles</a></li>
+                <li><a id="navPromos" href="promotions.html" class="text-gray-700 hover:text-veranumGreen font-medium">Promociones</a></li>
+                <li><a id="navCenters" href="event_centers.html" class="text-gray-700 hover:text-veranumGreen font-medium">Centro de Eventos</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Contacto</a></li>
+                <li><a href="login.html" class="text-veranumGreen hover:text-veranumDarkGreen font-bold px-3 py-1 border border-veranumGreen rounded-md transition duration-150">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero-bg h-[500px] flex items-center justify-center text-white relative">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="z-10 text-center p-6 bg-white bg-opacity-90 rounded-lg shadow-xl max-w-3xl w-full">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-veranumDarkGreen mb-4">Encuentra tu Escape Perfecto</h2>
+            <p class="text-gray-700 text-lg mb-8">Reserva tu próxima estadía en Hoteles VERANUM en Santiago o la V Región.</p>
+
+            <form id="searchForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="checkInDate" class="block text-left text-sm font-medium text-gray-700">Check-in</label>
+                    <input type="date" id="checkInDate" name="checkInDate" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen sm:text-sm text-gray-900">
+                </div>
+                <div>
+                    <label for="checkOutDate" class="block text-left text-sm font-medium text-gray-700">Check-out</label>
+                    <input type="date" id="checkOutDate" name="checkOutDate" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen sm:text-sm text-gray-900">
+                </div>
+                <div>
+                    <label for="location" class="block text-left text-sm font-medium text-gray-700">Ubicación</label>
+                    <select id="location" name="location"
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen sm:text-sm text-gray-900">
+                        <!-- opciones dinámicas -->
+                    </select>
+                </div>
+                <div>
+                    <label for="guests" class="block text-left text-sm font-medium text-gray-700">Huéspedes</label>
+                    <input type="number" id="guests" name="guests" min="1" value="1" required
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen sm:text-sm text-gray-900">
+                </div>
+                <div class="lg:col-span-4 flex justify-center mt-4">
+                    <button type="submit"
+                            class="search-button-gradient text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:opacity-90 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-veranumGreen">
+                        Buscar Habitaciones
+                    </button>
+                </div>
+            </form>
+            <div id="searchMessage" class="mt-4 text-sm font-medium text-center text-red-600 hidden"></div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center text-veranumDarkGreen mb-10">Nuestras Mejores Promociones</h3>
+            <div id="promotionHomeList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- dinámico -->
+            </div>
+            <div class="text-center mt-10">
+                <a href="promotions.html" class="bg-veranumGreen text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-veranumDarkGreen transition duration-300">Ver Todas las Promociones</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-light">
+        <div class="container mx-auto px-4">
+            <h3 class="text-3xl font-bold text-center text-veranumDarkGreen mb-10">Nuestros Centros de Eventos</h3>
+            <div id="eventCenterHomeList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- dinámico -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <div class="mb-4 md:mb-0">
+                <p>&copy; 2025 Hoteles VERANUM. Todos los derechos reservados.</p>
+            </div>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-veranumGreen">Política de Privacidad</a>
+                <a href="#" class="hover:text-veranumGreen">Términos y Condiciones</a>
+                <a href="#" class="hover:text-veranumGreen">Contáctanos</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('searchForm');
+            const checkInDateInput = document.getElementById('checkInDate');
+            const checkOutDateInput = document.getElementById('checkOutDate');
+            const searchMessage = document.getElementById('searchMessage');
+
+            // Preseleccionar ubicación si viene como parámetro en la URL (e.g., ?location=Santiago)
+            const urlParams = new URLSearchParams(window.location.search);
+            const locationParam = urlParams.get('location');
+            if (locationParam) {
+                const locationSelect = document.getElementById('location');
+                if (locationSelect) {
+                    locationSelect.value = locationParam;
+                }
+            }
+
+            // Set min date for check-in to today
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(today.getDate() + 1);
+
+            const todayFormatted = today.toISOString().split('T')[0];
+            const tomorrowFormatted = tomorrow.toISOString().split('T')[0];
+
+            checkInDateInput.min = todayFormatted;
+            checkOutDateInput.min = tomorrowFormatted; // Check-out cannot be same day as check-in
+
+            // Update min date for check-out when check-in date changes
+            checkInDateInput.addEventListener('change', function() {
+                if (checkInDateInput.value) {
+                    const checkIn = new Date(checkInDateInput.value);
+                    const nextDay = new Date(checkIn);
+                    nextDay.setDate(checkIn.getDate() + 1);
+                    checkOutDateInput.min = nextDay.toISOString().split('T')[0];
+
+                    // If check-out is before or same as check-in, reset it
+                    if (checkOutDateInput.value && new Date(checkOutDateInput.value) <= checkIn) {
+                        checkOutDateInput.value = '';
+                    }
+                } else {
+                    checkOutDateInput.min = tomorrowFormatted;
+                }
+            });
+
+            // Handle search form submission
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                const checkIn = new Date(checkInDateInput.value);
+                const checkOut = new Date(checkOutDateInput.value);
+
+                // Basic date validation
+                if (!checkInDateInput.value || !checkOutDateInput.value) {
+                    searchMessage.textContent = 'Por favor, selecciona las fechas de Check-in y Check-out.';
+                    searchMessage.classList.remove('hidden');
+                    return;
+                }
+
+                if (checkIn >= checkOut) {
+                    searchMessage.textContent = 'La fecha de Check-out debe ser posterior a la fecha de Check-in.';
+                    searchMessage.classList.remove('hidden');
+                    return;
+                }
+
+                // Hide message if validation passes
+                searchMessage.classList.add('hidden');
+
+                // Simulate search operation
+                const location = document.getElementById('location').value;
+                const guests = document.getElementById('guests').value;
+
+                console.log('Buscando habitaciones con los siguientes parámetros:');
+                console.log('Check-in:', checkInDateInput.value);
+                console.log('Check-out:', checkOutDateInput.value);
+                console.log('Ubicación:', location);
+                console.log('Huéspedes:', guests);
+
+                // Redirigir a la página de resultados pasando los parámetros en la URL
+                window.location.href = 'results.html?' + new URLSearchParams({
+                    checkIn: checkInDateInput.value,
+                    checkOut: checkOutDateInput.value,
+                    location: location,
+                    guests: guests
+                }).toString();
+            });
+
+            // --- Hoteles ---
+            const HOTEL_KEY = 'VERANUM_HOTELS';
+            const getHotels = () => JSON.parse(localStorage.getItem(HOTEL_KEY) || '[]');
+
+            // Popular selector de ubicación
+            const locationSelect = document.getElementById('location');
+            const populateLocationOptions = () => {
+                if(!locationSelect) return;
+                const current = locationSelect.value;
+                locationSelect.innerHTML = '<option value="">Cualquier Hotel</option>';
+                [...new Set(getHotels().map(h=>h.hotelLocation))].forEach(loc=>{
+                    const opt=document.createElement('option');
+                    opt.value=loc;
+                    opt.textContent=loc;
+                    locationSelect.appendChild(opt);
+                });
+                if(current) locationSelect.value=current;
+            };
+
+            populateLocationOptions();
+
+            // --- Centros de Eventos ---
+            const CENTER_KEY = 'VERANUM_EVENT_CENTERS';
+            const getCenters = () => JSON.parse(localStorage.getItem(CENTER_KEY) || '[]');
+            const renderCenterCard = (c) => {
+                const list = document.getElementById('eventCenterHomeList');
+                if(!list) return;
+                const html = `
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 flex flex-col">
+                        <div class="p-6 flex-1">
+                            <h4 class="text-xl font-semibold text-veranumDarkGreen mb-2">${c.name}</h4>
+                            <p class="text-gray-700 text-sm mb-1"><strong>Hotel:</strong> ${c.hotel}</p>
+                            <p class="text-gray-700 text-sm mb-1"><strong>Capacidad:</strong> ${c.capacity} personas</p>
+                            <p class="text-gray-500 text-xs">${c.desc || 'Sin descripción.'}</p>
+                        </div>
+                        <div class="p-4 bg-light flex justify-end">
+                            <a href="event_centers.html" class="text-veranumGreen hover:underline font-semibold text-sm">Ver Detalles →</a>
+                        </div>
+                    </div>`;
+                list.insertAdjacentHTML('beforeend', html);
+            };
+            getCenters().forEach(renderCenterCard);
+
+            // --- Promociones ---
+            const PROMO_KEY = 'VERANUM_PROMOTIONS';
+            const getPromos = () => JSON.parse(localStorage.getItem(PROMO_KEY) || '[]');
+            const renderPromoCard = (p) => {
+                const list = document.getElementById('promotionHomeList');
+                if(!list) return;
+                const discountTxt = p.discountType === 'percentage' ? `${p.discountValue}%` : `${Number(p.discountValue).toLocaleString('es-CL')} CLP`;
+                const img = 'https://placehold.co/400x250/34C759/ffffff?text=Promo';
+                const html = `
+                    <div class="bg-light rounded-lg shadow-lg overflow-hidden border border-gray-200 flex flex-col">
+                        <img src="${img}" alt="Promoción ${p.promoName}" class="w-full h-48 object-cover">
+                        <div class="p-6 flex-1">
+                            <h4 class="text-xl font-semibold text-veranumDarkGreen mb-2">${p.promoName} - ${discountTxt} OFF</h4>
+                            <p class="text-gray-700 text-sm mb-4">Válido del ${p.validFrom} al ${p.validTo}. Aplica a ${p.appliesToHotel}</p>
+                        </div>
+                        <div class="p-4 bg-light flex justify-end">
+                            <a href="promotions.html" class="text-veranumGreen hover:underline font-semibold text-sm">Ver Detalles →</a>
+                        </div>
+                    </div>`;
+                list.insertAdjacentHTML('beforeend', html);
+            };
+
+            // mostrar sólo aprobadas
+            getPromos().filter(pr=>pr.approved).forEach(renderPromoCard);
+
+            // Listener de storage para refrescar en vivo
+            const refreshHome = () => {
+                document.getElementById('promotionHomeList').innerHTML='';
+                document.getElementById('eventCenterHomeList').innerHTML='';
+                getPromos().filter(pr=>pr.approved).forEach(renderPromoCard);
+                getCenters().forEach(renderCenterCard);
+            };
+            window.addEventListener('storage', (e)=>{
+                if([PROMO_KEY,CENTER_KEY].includes(e.key)) refreshHome();
+                if(e.key===HOTEL_KEY) { populateLocationOptions(); updateNavCounts(); }
+            });
+
+            // Actualizar conteos en nav
+            const updateNavCounts = () => {
+                const hotelsCount = getHotels().length;
+                const promosCount = getPromos().filter(pr=>pr.approved).length;
+                const centerCount = getCenters().length;
+                document.getElementById('navHotels').textContent = `Hoteles (${hotelsCount})`;
+                document.getElementById('navPromos').textContent = `Promociones (${promosCount})`;
+                document.getElementById('navCenters').textContent = `Centro de Eventos (${centerCount})`;
+            };
+
+            updateNavCounts();
+        });
+    </script>
+</body>
+</html>

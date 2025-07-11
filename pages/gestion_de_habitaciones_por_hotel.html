@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Gestión de Habitaciones</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                        veranumGreen: '#34C759'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Gestión de Habitaciones VERANUM</h1>
+
+        <!-- Sección para añadir una nueva habitación -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Añadir Nueva Habitación</h2>
+            <form id="addRoomForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="hotelSelect" class="block text-gray-700 text-sm font-medium mb-2">Hotel</label>
+                    <select id="hotelSelect" name="hotel" required>
+                        <option value="">Selecciona un hotel</option>
+                        <!-- Opciones añadidas dinámicamente -->
+                    </select>
+                </div>
+                <div>
+                    <label for="roomNumber" class="block text-gray-700 text-sm font-medium mb-2">Número/Nombre de Habitación</label>
+                    <input type="text" id="roomNumber" name="roomNumber" placeholder="Ej: 101, Suite Presidencial" required>
+                </div>
+                <div>
+                    <label for="capacity" class="block text-gray-700 text-sm font-medium mb-2">Capacidad de Personas</label>
+                    <input type="number" id="capacity" name="capacity" min="1" value="2" required>
+                </div>
+                <div>
+                    <label for="beds" class="block text-gray-700 text-sm font-medium mb-2">Cantidad de Camas</label>
+                    <input type="number" id="beds" name="beds" min="1" value="1" required>
+                </div>
+                <div>
+                    <label for="bathrooms" class="block text-gray-700 text-sm font-medium mb-2">Cantidad de Baños</label>
+                    <input type="number" id="bathrooms" name="bathrooms" min="1" value="1" required>
+                </div>
+                <div>
+                    <label for="serviceType" class="block text-gray-700 text-sm font-medium mb-2">Tipo de Servicio</label>
+                    <select id="serviceType" name="serviceType" required>
+                        <option value="Estándar">Estándar</option>
+                        <option value="Superior">Superior</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Ejecutiva">Ejecutiva</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="dailyPrice" class="block text-gray-700 text-sm font-medium mb-2">Precio por Día (CLP)</label>
+                    <input type="number" id="dailyPrice" name="dailyPrice" min="0" step="1000" placeholder="Ej: 50000" required>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Guardar Habitación
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección para mostrar la lista de habitaciones -->
+        <div>
+            <h2 class="text-2xl font-semibold text-dark mb-4">Habitaciones Registradas</h2>
+            <div id="roomList" class="space-y-4">
+                <!-- Habitaciones de ejemplo cargadas aquí -->
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Funciones globales para mostrar/ocultar mensajes
+        window.showMessage = function(message) {
+            const box = document.getElementById('messageBox');
+            const text = document.getElementById('messageText');
+            if (box && text) {
+                text.innerText = message;
+                box.classList.remove('hidden');
+            }
+        };
+
+        window.hideMessage = function() {
+            const box = document.getElementById('messageBox');
+            if (box) box.classList.add('hidden');
+        };
+
+        // --- Persistencia de Habitaciones ---
+        const STORAGE_KEY = 'VERANUM_ROOMS';
+        const HOTEL_KEY = 'VERANUM_HOTELS';
+        let editingRoomId = null; // <--- NUEVO para modo edición
+
+        function getRooms() {
+            const json = localStorage.getItem(STORAGE_KEY);
+            return json ? JSON.parse(json) : [];
+        }
+
+        function saveRooms(rooms) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(rooms));
+        }
+
+        function getHotels() {
+            const json = localStorage.getItem(HOTEL_KEY);
+            return json ? JSON.parse(json) : [];
+        }
+
+        function renderRoom(room) {
+            const roomListDiv = document.getElementById('roomList');
+            if (!roomListDiv) return;
+            const html = `
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center mb-4" data-id="${room.id}">
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">${room.hotelName} - Hab ${room.roomNumber}</h3>
+                        <p class="text-gray-600 text-sm">Capacidad: ${room.capacity} | Camas: ${room.beds} | Baños: ${room.bathrooms} | Servicio: ${room.serviceType}</p>
+                        <p class="text-gray-600 text-sm">Precio Diario: CLP ${room.dailyPrice.toLocaleString('es-CL')}</p>
+                    </div>
+                    <div class="flex space-x-3 mt-3 md:mt-0">
+                        <button class="edit-room bg-blue-100 text-primary py-1 px-4 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                        <button onclick="window.openRoomModal(${room.id})" class="bg-green-100 text-green-700 py-1 px-4 rounded-md text-sm hover:bg-green-200">Precio</button>
+                    </div>
+                </div>`;
+            roomListDiv.insertAdjacentHTML('afterbegin', html);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Renderizar habitaciones guardadas
+            getRooms().forEach(renderRoom);
+
+            const form = document.getElementById('addRoomForm');
+            if (!form) return;
+
+            const hotelSelect = document.getElementById('hotelSelect');
+            if (hotelSelect) {
+                getHotels().forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.id;
+                    opt.textContent = h.hotelName || h.name || 'Hotel sin nombre';
+                    hotelSelect.appendChild(opt);
+                });
+            }
+
+            // Delegación para botón Editar Habitación
+            document.getElementById('roomList')?.addEventListener('click', e => {
+                if(e.target.classList.contains('edit-room')){
+                    const container = e.target.closest('[data-id]');
+                    const id = Number(container.dataset.id);
+                    const arr = getRooms();
+                    const rm = arr.find(r => r.id === id);
+                    if(rm){
+                        document.getElementById('hotelSelect').value = getHotels().find(h=>h.hotelName===rm.hotelName)?.id || '';
+                        document.getElementById('roomNumber').value = rm.roomNumber;
+                        document.getElementById('capacity').value = rm.capacity;
+                        document.getElementById('beds').value = rm.beds;
+                        document.getElementById('bathrooms').value = rm.bathrooms;
+                        document.getElementById('serviceType').value = rm.serviceType;
+                        document.getElementById('dailyPrice').value = rm.dailyPrice;
+                        editingRoomId = id;
+                        form.querySelector('button[type="submit"]').innerText = 'Guardar Cambios';
+                    }
+                }
+            });
+
+            // ---- Poblado automático de habitaciones ----
+            let roomsArr = getRooms();
+            const hotelsArr = getHotels();
+            if (roomsArr.length === 0 && hotelsArr.length > 0) {
+                hotelsArr.forEach(h => {
+                    // Dos habitaciones de ejemplo por hotel
+                    const baseId = Date.now() + Math.floor(Math.random() * 1000);
+                    const samples = [
+                        {
+                            id: baseId,
+                            hotelName: h.hotelName || h.name || 'Hotel',
+                            roomNumber: '101',
+                            capacity: 2,
+                            beds: 1,
+                            bathrooms: 1,
+                            serviceType: 'Standard',
+                            dailyPrice: 50000,
+                            priceHistory: []
+                        },
+                        {
+                            id: baseId + 1,
+                            hotelName: h.hotelName || h.name || 'Hotel',
+                            roomNumber: '102',
+                            capacity: 4,
+                            beds: 2,
+                            bathrooms: 1,
+                            serviceType: 'Familiar',
+                            dailyPrice: 80000,
+                            priceHistory: []
+                        }
+                    ];
+                    roomsArr = roomsArr.concat(samples);
+                });
+                saveRooms(roomsArr);
+                roomsArr.forEach(renderRoom);
+            }
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const hotelIdSel = document.getElementById('hotelSelect').value;
+                const hotelObj = getHotels().find(h => String(h.id) === hotelIdSel);
+                const hotelName = hotelObj ? (hotelObj.hotelName || hotelObj.name) : '';
+                const roomNumber = document.getElementById('roomNumber').value;
+                const capacity = parseInt(document.getElementById('capacity').value);
+                const beds = parseInt(document.getElementById('beds').value);
+                const bathrooms = parseInt(document.getElementById('bathrooms').value);
+                const serviceType = document.getElementById('serviceType').value;
+                const dailyPriceValue = parseInt(document.getElementById('dailyPrice').value);
+
+                if (!hotelName || !roomNumber) {
+                    window.showMessage('Completa los campos obligatorios.');
+                    return;
+                }
+
+                const rooms = getRooms();
+
+                if(editingRoomId){
+                    const idx = rooms.findIndex(r => r.id === editingRoomId);
+                    if(idx > -1){
+                        rooms[idx] = { ...rooms[idx], hotelName, roomNumber, capacity, beds, bathrooms, serviceType, dailyPrice: dailyPriceValue };
+                        saveRooms(rooms);
+                        document.getElementById('roomList').innerHTML = '';
+                        rooms.slice().reverse().forEach(renderRoom);
+                        window.showMessage(`Habitación "${roomNumber}" actualizada.`);
+                        editingRoomId = null;
+                        form.querySelector('button[type="submit"]').innerText = 'Guardar Habitación';
+                    }
+                }else{
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const newRoom = {
+                        id: Date.now(),
+                        hotelName,
+                        roomNumber,
+                        capacity,
+                        beds,
+                        bathrooms,
+                        serviceType,
+                        dailyPrice: dailyPriceValue,
+                        priceHistory: [{ date: todayStr, oldPrice: null, newPrice: dailyPriceValue }]
+                    };
+                    rooms.push(newRoom);
+                    saveRooms(rooms);
+                    renderRoom(newRoom);
+                    window.showMessage(`Habitación "${roomNumber}" del ${hotelName} guardada.`);
+                }
+                form.reset();
+            });
+        });
+
+        // --- Modal Ver/Editar ---
+        window.openRoomModal = (rid) => {
+            const room = getRooms().find(r => r.id === rid);
+            if (!room) return;
+            const modal = document.getElementById('roomModal');
+            const content = document.getElementById('roomModalContent');
+            const historyRows = room.priceHistory?.map(h => `<tr><td class="border px-2 py-1 text-xs">${h.date}</td><td class="border px-2 py-1 text-xs">${h.oldPrice === null ? '-' : `CLP ${h.oldPrice.toLocaleString('es-CL')}`}</td><td class="border px-2 py-1 text-xs">CLP ${h.newPrice.toLocaleString('es-CL')}</td></tr>`).join('') || '';
+            content.innerHTML = `
+                <h3 class="text-lg font-bold mb-4">${room.hotelName} - Habitación ${room.roomNumber}</h3>
+                <label class="block text-sm mb-1">Precio Diario (CLP)</label>
+                <input type="number" id="editPriceInput" value="${room.dailyPrice}" class="border w-full mb-4 p-2 rounded-md">
+                <h4 class="font-semibold mb-2">Historial de Precios</h4>
+                <table class="w-full text-left text-sm mb-4 border"><thead><tr class="bg-gray-100"><th class="border px-2 py-1">Fecha</th><th class="border px-2 py-1">Anterior</th><th class="border px-2 py-1">Nuevo</th></tr></thead><tbody>${historyRows}</tbody></table>
+                <div class="flex justify-end space-x-3">
+                    <button id="savePriceBtn" class="bg-veranumGreen text-white px-4 py-2 rounded-md">Guardar</button>
+                    <button onclick="window.closeRoomModal()" class="bg-gray-300 px-4 py-2 rounded-md">Cerrar</button>
+                </div>`;
+            modal.classList.remove('hidden');
+
+            document.getElementById('savePriceBtn').onclick = () => {
+                const newP = parseFloat(document.getElementById('editPriceInput').value);
+                if (isNaN(newP) || newP <= 0) { alert('Precio inválido'); return; }
+                if (newP !== room.dailyPrice) {
+                    const today = new Date().toISOString().split('T')[0];
+                    room.priceHistory = room.priceHistory || [];
+                    room.priceHistory.push({ date: today, oldPrice: room.dailyPrice, newPrice: newP });
+                    room.dailyPrice = newP;
+                    const rooms = getRooms().map(r => r.id === room.id ? room : r);
+                    saveRooms(rooms);
+                    document.getElementById('roomList').innerHTML = '';
+                    rooms.forEach(renderRoom);
+                    openRoomModal(room.id); // refresh modal
+                }
+            };
+        };
+
+        window.closeRoomModal = () => document.getElementById('roomModal').classList.add('hidden');
+    </script>
+
+    <!-- Modal Habitación -->
+    <div id="roomModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+        <div id="roomModalContent" class="bg-white rounded-lg p-6 shadow-xl max-w-md w-full"></div>
+    </div>
+</body>
+</html>

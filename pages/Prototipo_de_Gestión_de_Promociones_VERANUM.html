@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Gestión de Promociones</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                        success: '#22C55E', /* Color para promociones activas */
+                        warning: '#FBBF24', /* Color para promociones pendientes */
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Gestión de Promociones VERANUM</h1>
+
+        <!-- Sección para añadir una nueva promoción -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Crear Nueva Promoción</h2>
+            <form id="addPromotionForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="promoName" class="block text-gray-700 text-sm font-medium mb-2">Nombre de la Promoción</label>
+                    <input type="text" id="promoName" name="promoName" placeholder="Ej: Verano Mágico" required>
+                </div>
+                <div>
+                    <label for="discountType" class="block text-gray-700 text-sm font-medium mb-2">Tipo de Descuento</label>
+                    <select id="discountType" name="discountType" required>
+                        <option value="percentage">Porcentaje (%)</option>
+                        <option value="amount">Monto Fijo (CLP)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="discountValue" class="block text-gray-700 text-sm font-medium mb-2">Valor del Descuento</label>
+                    <input type="number" id="discountValue" name="discountValue" min="1" step="any" placeholder="Ej: 15 (para 15% o 15.000 CLP)" required>
+                </div>
+                <div>
+                    <label for="validFrom" class="block text-gray-700 text-sm font-medium mb-2">Válido Desde</label>
+                    <input type="date" id="validFrom" name="validFrom" required>
+                </div>
+                <div>
+                    <label for="validTo" class="block text-gray-700 text-sm font-medium mb-2">Válido Hasta</label>
+                    <input type="date" id="validTo" name="validTo" required>
+                </div>
+                <div>
+                    <label for="appliesToHotel" class="block text-gray-700 text-sm font-medium mb-2">Aplica a Hotel</label>
+                    <select id="appliesToHotel" name="appliesToHotel">
+                        <option value="all">Todos los Hoteles</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="appliesToRoomType" class="block text-gray-700 text-sm font-medium mb-2">Aplica a Tipo de Habitación (separar por coma)</label>
+                    <input type="text" id="appliesToRoomType" name="appliesToRoomType" placeholder="Ej: Estándar, Suite (dejar vacío para todos)">
+                </div>
+                 <div class="md:col-span-2">
+                    <label for="promoDescription" class="block text-gray-700 text-sm font-medium mb-2">Descripción de la Promoción</label>
+                    <textarea id="promoDescription" name="promoDescription" rows="2" placeholder="Detalles y condiciones de la promoción."></textarea>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Guardar Promoción
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección para mostrar la lista de promociones -->
+        <div>
+            <h2 class="text-2xl font-semibold text-dark mb-4">Promociones Activas y Pendientes</h2>
+            <div id="promotionList" class="space-y-4">
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Funciones globales de mensajes
+        window.showMessage = (msg) => {
+            const box = document.getElementById('messageBox');
+            const text = document.getElementById('messageText');
+            if (box && text) { text.innerText = msg; box.classList.remove('hidden'); }
+        };
+        window.hideMessage = () => document.getElementById('messageBox')?.classList.add('hidden');
+
+        // --- Persistencia de Promociones ---
+        const STORAGE_KEY = 'VERANUM_PROMOTIONS';
+        const HOTEL_KEY = 'VERANUM_HOTELS';
+        let editingPromoId = null;
+        const getPromos = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const savePromos = (arr) => localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+        const getHotels = () => JSON.parse(localStorage.getItem(HOTEL_KEY) || '[]');
+
+        const renderPromotion = (promo) => {
+            const list = document.getElementById('promotionList');
+            if (!list) return;
+            const statusLabel = promo.approved ?
+                '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-success text-white">Activa</span>' :
+                '<span class="px-3 py-1 text-xs font-semibold rounded-full bg-warning text-dark">Pendiente</span>';
+            const discountTxt = promo.discountType === 'percentage' ? `${promo.discountValue}%` : `${promo.discountValue.toLocaleString('es-CL')} CLP`;
+            const html = `
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center mb-4" data-id="${promo.id}">
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">${promo.promoName} - ${discountTxt} OFF</h3>
+                        <p class="text-gray-600 text-sm">Válido: ${promo.validFrom} al ${promo.validTo} | Aplica a: ${promo.appliesToHotel}, Hab. ${promo.appliesToRoomType || 'Todas'}</p>
+                        <p class="text-gray-600 text-xs mt-1">${promo.promoDescription || 'Sin descripción.'}</p>
+                    </div>
+                    <button class="edit-promo mt-3 md:mt-0 bg-blue-100 text-primary py-1 px-4 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                </div>`;
+            list.insertAdjacentHTML('afterbegin', html);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('addPromotionForm');
+            const hotelSelect = document.getElementById('appliesToHotel');
+            // Poblar hoteles dinámicamente
+            if (hotelSelect) {
+                hotelSelect.innerHTML = '<option value="all">Todos los Hoteles</option>'; // reset
+                getHotels().forEach(h=>{
+                    const opt=document.createElement('option');
+                    opt.value=h.id;
+                    opt.textContent=h.hotelName||h.name||'Hotel';
+                    hotelSelect.appendChild(opt);
+                });
+            }
+
+            // Poblar promociones iniciales si no existen
+            let promos = getPromos();
+            const hotelsArr = getHotels();
+            if (promos.length === 0 && hotelsArr.length>0) {
+                const sample = {
+                    id: Date.now(),
+                    promoName: 'Promo Bienvenida',
+                    discountType: 'percentage',
+                    discountValue: 15,
+                    validFrom: new Date().toISOString().split('T')[0],
+                    validTo: new Date(Date.now()+86400000*30).toISOString().split('T')[0],
+                    appliesToHotel: hotelsArr[0].hotelName || hotelsArr[0].name,
+                    appliesToRoomType: '',
+                    promoDescription: '15% de descuento para reservas anticipadas.',
+                    approved: true
+                };
+                promos.push(sample);
+                savePromos(promos);
+            }
+
+            // Render existentes
+            getPromos().forEach(renderPromotion);
+
+            if (!form) return;
+
+            // Delegación editar
+            document.getElementById('promotionList')?.addEventListener('click', e=>{
+                if(e.target.classList.contains('edit-promo')){
+                    const container=e.target.closest('[data-id]');
+                    const id=Number(container.dataset.id);
+                    const promo=getPromos().find(p=>p.id===id);
+                    if(promo){
+                        document.getElementById('promoName').value=promo.promoName;
+                        document.getElementById('discountType').value=promo.discountType;
+                        document.getElementById('discountValue').value=promo.discountValue;
+                        document.getElementById('validFrom').value=promo.validFrom;
+                        document.getElementById('validTo').value=promo.validTo;
+                        document.getElementById('appliesToHotel').value=getHotels().find(h=> (h.hotelName||h.name)===promo.appliesToHotel)?.id || 'all';
+                        document.getElementById('appliesToRoomType').value=promo.appliesToRoomType;
+                        document.getElementById('promoDescription').value=promo.promoDescription;
+                        editingPromoId=id;
+                        form.querySelector('button[type="submit"]').innerText='Guardar Cambios';
+                    }
+                }
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const promoName = document.getElementById('promoName').value;
+                const discountType = document.getElementById('discountType').value;
+                const discountValue = parseFloat(document.getElementById('discountValue').value);
+                const validFrom = document.getElementById('validFrom').value;
+                const validTo = document.getElementById('validTo').value;
+                const hotelSel=document.getElementById('appliesToHotel').value;
+                const hotelObj = hotelSel==='all'? null : getHotels().find(h=>String(h.id)===hotelSel);
+                const appliesToHotel = hotelObj ? (hotelObj.hotelName||hotelObj.name) : 'Todos los Hoteles';
+                const appliesToRoomType = document.getElementById('appliesToRoomType').value;
+                const promoDescription = document.getElementById('promoDescription').value;
+
+                if (new Date(validFrom) > new Date(validTo)) {
+                    window.showMessage('La fecha "Válido Desde" no puede ser posterior a "Válido Hasta".');
+                    return;
+                }
+
+                let promosArr = getPromos();
+
+                if(editingPromoId){
+                    const i=promosArr.findIndex(p=>p.id===editingPromoId);
+                    if(i>-1){
+                        promosArr[i]={...promosArr[i], promoName, discountType, discountValue, validFrom, validTo, appliesToHotel, appliesToRoomType, promoDescription};
+                        savePromos(promosArr);
+                        document.getElementById('promotionList').innerHTML='';
+                        promosArr.slice().reverse().forEach(renderPromotion);
+                        window.showMessage(`Promoción "${promoName}" actualizada.`);
+                        editingPromoId=null;
+                        form.querySelector('button[type="submit"]').innerText='Guardar Promoción';
+                    }
+                }else{
+                    const newPromo={
+                        id:Date.now(),
+                        promoName,discountType,discountValue,validFrom,validTo,appliesToHotel,appliesToRoomType,promoDescription,approved:false
+                    };
+                    promosArr.push(newPromo);
+                    savePromos(promosArr);
+                    renderPromotion(newPromo);
+                    window.showMessage(`Promoción "${promoName}" guardada.`);
+                }
+
+                form.reset();
+            });
+        });
+    </script>
+</body>
+</html>

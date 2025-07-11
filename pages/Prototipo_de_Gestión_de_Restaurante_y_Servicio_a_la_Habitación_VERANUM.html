@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Gestión de Restaurante y Servicio a la Habitación</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                        pending: '#FBBF24', // Amarillo para estado pendiente
+                        completed: '#22C55E', // Verde para estado completado
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .order-item input {
+            flex-grow: 1;
+            margin-right: 0.5rem;
+        }
+        .order-item button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Gestión de Restaurante y Servicio a la Habitación VERANUM</h1>
+
+        <!-- Sección para la gestión del menú -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión del Menú del Restaurante</h2>
+            <form id="addMenuItemForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="dishName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Plato/Bebida</label>
+                    <input type="text" id="dishName" name="dishName" placeholder="Ej: Lasagna de Carne" required>
+                </div>
+                <div>
+                    <label for="dishCategory" class="block text-gray-700 text-sm font-medium mb-2">Categoría</label>
+                    <select id="dishCategory" name="dishCategory" required>
+                        <option value="">Selecciona categoría</option>
+                        <option value="Entrada">Entrada</option>
+                        <option value="Plato Principal">Plato Principal</option>
+                        <option value="Postre">Postre</option>
+                        <option value="Bebida">Bebida</option>
+                        <option value="Desayuno">Desayuno</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="dishPrice" class="block text-gray-700 text-sm font-medium mb-2">Precio (CLP)</label>
+                    <input type="number" id="dishPrice" name="dishPrice" min="0" step="100" placeholder="Ej: 12500" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="dishDescription" class="block text-gray-700 text-sm font-medium mb-2">Descripción</label>
+                    <textarea id="dishDescription" name="dishDescription" rows="2" placeholder="Breve descripción del plato e ingredientes."></textarea>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Guardar Plato
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Platos del Menú</h3>
+                <div id="menuList" class="space-y-3">
+                    <!-- Ejemplos de platos -->
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-dark">Lomo Saltado <span class="text-sm font-normal text-gray-600">(Plato Principal)</span></p>
+                            <p class="text-gray-700 text-sm">CLP 14.990</p>
+                            <p class="text-gray-600 text-xs">Tiernos trozos de lomo con cebolla, tomate y papas fritas.</p>
+                        </div>
+                        <button onclick="window.showMessage('Editar Lomo Saltado.')" class="bg-blue-100 text-primary py-1 px-3 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-dark">Ensalada César <span class="text-sm font-normal text-gray-600">(Entrada)</span></p>
+                            <p class="text-gray-700 text-sm">CLP 7.500</p>
+                            <p class="text-gray-600 text-xs">Lechuga, crutones, queso parmesano y aderezo César.</p>
+                        </div>
+                        <button onclick="window.showMessage('Editar Ensalada César.')" class="bg-blue-100 text-primary py-1 px-3 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección para la gestión de pedidos -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Pedidos (Restaurante / Habitación)</h2>
+            <form id="createOrderForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="orderCustomer" class="block text-gray-700 text-sm font-medium mb-2">Cliente/Habitación</label>
+                    <input type="text" id="orderCustomer" name="orderCustomer" placeholder="Ej: Hab. 305 / Juan Pérez" required>
+                </div>
+                <div>
+                    <label for="orderType" class="block text-gray-700 text-sm font-medium mb-2">Tipo de Pedido</label>
+                    <select id="orderType" name="orderType" required>
+                        <option value="Restaurante">Restaurante</option>
+                        <option value="Room Service">Servicio a la Habitación</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 text-sm font-medium mb-2">Items del Pedido</label>
+                    <div id="orderItemsContainer">
+                        <div class="order-item">
+                            <input type="text" class="menu-item-input" placeholder="Nombre del plato/bebida" required>
+                            <input type="number" class="item-quantity-input" value="1" min="1">
+                            <button type="button" onclick="this.parentNode.remove()" class="bg-red-200 text-red-800 hover:bg-red-300">X</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="window.addOrderItem()" class="mt-2 bg-gray-200 text-gray-800 py-1 px-3 rounded-md text-sm hover:bg-gray-300">
+                        + Añadir Item
+                    </button>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Crear Pedido
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Pedidos Recientes</h3>
+                <div id="orderList" class="space-y-3">
+                    <!-- Ejemplos de pedidos -->
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-dark">Pedido #00123 - Hab. 305 <span class="text-sm font-normal text-gray-600">(Room Service)</span></p>
+                            <p class="text-gray-700 text-sm">Items: Lomo Saltado (1), Agua Mineral (1)</p>
+                            <p class="text-gray-600 text-xs">Total: CLP 16.500</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-pending text-dark mb-2">Pendiente</span>
+                            <button onclick="window.showMessage('Completar Pedido #00123.')" class="bg-completed-100 text-completed py-1 px-3 rounded-md text-sm hover:bg-completed-200">Completar</button>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center">
+                        <div>
+                            <p class="font-semibold text-dark">Pedido #00122 - Restaurante <span class="text-sm font-normal text-gray-600">(Mesa 7)</span></p>
+                            <p class="text-gray-700 text-sm">Items: Ensalada César (1), Vino Tinto (1)</p>
+                            <p class="text-gray-600 text-xs">Total: CLP 15.000</p>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-completed text-white mb-2">Completado</span>
+                            <button onclick="window.showMessage('Ver detalles Pedido #00122.')" class="bg-blue-100 text-primary py-1 px-3 rounded-md text-sm hover:bg-blue-200">Ver</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección para la gestión de insumos -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Insumos de Cocina</h2>
+            <form id="orderSupplyForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="supplyItem" class="block text-gray-700 text-sm font-medium mb-2">Insumo</label>
+                    <input type="text" id="supplyItem" name="supplyItem" placeholder="Ej: Aceite de Oliva" required>
+                </div>
+                <div>
+                    <label for="supplyQuantity" class="block text-gray-700 text-sm font-medium mb-2">Cantidad</label>
+                    <input type="number" id="supplyQuantity" name="supplyQuantity" min="1" value="10" required>
+                </div>
+                <div>
+                    <label for="supplyUnit" class="block text-gray-700 text-sm font-medium mb-2">Unidad</label>
+                    <select id="supplyUnit" name="supplyUnit" required>
+                        <option value="kg">Kilogramos (kg)</option>
+                        <option value="litros">Litros</option>
+                        <option value="unidades">Unidades</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="supplier" class="block text-gray-700 text-sm font-medium mb-2">Proveedor</label>
+                    <input type="text" id="supplier" name="supplier" placeholder="Ej: Distr. Alimentos S.A." required>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Realizar Pedido a Proveedor
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Historial de Pedidos a Proveedores (Simulado)</h3>
+                <div id="supplyOrderList" class="space-y-3">
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <p class="font-semibold text-dark">Pedido: Tomates (20 kg) a Verduras Frescas</p>
+                        <p class="text-gray-600 text-sm">Fecha: 2024-06-10 | Estado: Entregado</p>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+                        <p class="font-semibold text-dark">Pedido: Salmón (10 kg) a Pescados Premium</p>
+                        <p class="text-gray-600 text-sm">Fecha: 2024-06-12 | Estado: Pendiente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Funciones para mostrar y ocultar mensajes (hechas globales para el onclick)
+        window.showMessage = function(message) {
+            document.getElementById('messageText').innerText = message;
+            document.getElementById('messageBox').classList.remove('hidden');
+        }
+
+        window.hideMessage = function() {
+            document.getElementById('messageBox').classList.add('hidden');
+        }
+
+        // Simulación de añadir un plato al menú
+        document.getElementById('addMenuItemForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const dishName = document.getElementById('dishName').value;
+            const dishCategory = document.getElementById('dishCategory').value;
+            const dishPrice = parseFloat(document.getElementById('dishPrice').value).toLocaleString('es-CL');
+            const dishDescription = document.getElementById('dishDescription').value;
+
+            console.log('Nuevo plato a guardar:', { dishName, dishCategory, dishPrice, dishDescription });
+            window.showMessage(`Plato "${dishName}" (${dishCategory}) guardado por CLP ${dishPrice} (simulado).`);
+
+            const menuListDiv = document.getElementById('menuList');
+            const newMenuItemHtml = `
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold text-dark">${dishName} <span class="text-sm font-normal text-gray-600">(${dishCategory})</span></p>
+                        <p class="text-gray-700 text-sm">CLP ${dishPrice}</p>
+                        <p class="text-gray-600 text-xs">${dishDescription || 'Sin descripción.'}</p>
+                    </div>
+                    <button onclick="window.showMessage('Editar ${dishName}.')" class="bg-blue-100 text-primary py-1 px-3 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                </div>
+            `;
+            menuListDiv.insertAdjacentHTML('afterbegin', newMenuItemHtml);
+            document.getElementById('addMenuItemForm').reset();
+        });
+
+        // Función para añadir un campo de item a un pedido
+        window.addOrderItem = function() {
+            const container = document.getElementById('orderItemsContainer');
+            const newDiv = document.createElement('div');
+            newDiv.classList.add('order-item');
+            newDiv.innerHTML = `
+                <input type="text" class="menu-item-input" placeholder="Nombre del plato/bebida" required>
+                <input type="number" class="item-quantity-input" value="1" min="1">
+                <button type="button" onclick="this.parentNode.remove()" class="bg-red-200 text-red-800 hover:bg-red-300">X</button>
+            `;
+            container.appendChild(newDiv);
+        };
+
+        // Simulación de crear un pedido
+        document.getElementById('createOrderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const orderCustomer = document.getElementById('orderCustomer').value;
+            const orderType = document.getElementById('orderType').value;
+            const orderItems = [];
+            let totalOrderPrice = 0;
+
+            document.querySelectorAll('#orderItemsContainer .order-item').forEach(itemDiv => {
+                const item = itemDiv.querySelector('.menu-item-input').value;
+                const quantity = parseInt(itemDiv.querySelector('.item-quantity-input').value);
+                // Aquí, en un sistema real, buscarías el precio del 'item' de la base de datos del menú
+                // Por simplicidad, asignaremos un precio fijo simulado
+                const simulatedPricePerItem = 7500; // Ejemplo de precio
+                orderItems.push(`${item} (${quantity})`);
+                totalOrderPrice += (simulatedPricePerItem * quantity);
+            });
+
+            const orderId = `PED-${Math.floor(Math.random() * 100000).toString().padStart(5, '0')}`;
+            console.log('Nuevo pedido a crear:', { orderId, orderCustomer, orderType, orderItems, totalOrderPrice });
+            window.showMessage(`Pedido #${orderId} para ${orderCustomer} creado. Total: CLP ${totalOrderPrice.toLocaleString('es-CL')} (simulado).`);
+
+            const orderListDiv = document.getElementById('orderList');
+            const newOrderHtml = `
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold text-dark">Pedido #${orderId} - ${orderCustomer} <span class="text-sm font-normal text-gray-600">(${orderType})</span></p>
+                        <p class="text-gray-700 text-sm">Items: ${orderItems.join(', ')}</p>
+                        <p class="text-gray-600 text-xs">Total: CLP ${totalOrderPrice.toLocaleString('es-CL')}</p>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-pending text-dark mb-2">Pendiente</span>
+                        <button onclick="window.showMessage('Completar Pedido #${orderId}.')" class="bg-completed-100 text-completed py-1 px-3 rounded-md text-sm hover:bg-completed-200">Completar</button>
+                    </div>
+                </div>
+            `;
+            orderListDiv.insertAdjacentHTML('afterbegin', newOrderHtml);
+            document.getElementById('createOrderForm').reset();
+            // Reset items container, keep one empty input
+            const initialItemHtml = `
+                <div class="order-item">
+                    <input type="text" class="menu-item-input" placeholder="Nombre del plato/bebida" required>
+                    <input type="number" class="item-quantity-input" value="1" min="1">
+                    <button type="button" onclick="this.parentNode.remove()" class="bg-red-200 text-red-800 hover:bg-red-300">X</button>
+                </div>
+            `;
+            document.getElementById('orderItemsContainer').innerHTML = initialItemHtml;
+        });
+
+        // Simulación de pedido a proveedor
+        document.getElementById('orderSupplyForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const supplyItem = document.getElementById('supplyItem').value;
+            const supplyQuantity = document.getElementById('supplyQuantity').value;
+            const supplyUnit = document.getElementById('supplyUnit').value;
+            const supplier = document.getElementById('supplier').value;
+            const orderDate = new Date().toLocaleDateString('es-CL');
+
+            console.log('Nuevo pedido a proveedor:', { supplyItem, supplyQuantity, supplyUnit, supplier, orderDate });
+            window.showMessage(`Pedido de ${supplyQuantity} ${supplyUnit} de "${supplyItem}" a ${supplier} realizado (simulado).`);
+
+            const supplyOrderListDiv = document.getElementById('supplyOrderList');
+            const newSupplyOrderHtml = `
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <p class="font-semibold text-dark">Pedido: ${supplyItem} (${supplyQuantity} ${supplyUnit}) a ${supplier}</p>
+                    <p class="text-gray-600 text-sm">Fecha: ${orderDate} | Estado: Pendiente</p>
+                </div>
+            `;
+            supplyOrderListDiv.insertAdjacentHTML('afterbegin', newSupplyOrderHtml);
+            document.getElementById('orderSupplyForm').reset();
+        });
+    </script>
+</body>
+</html>

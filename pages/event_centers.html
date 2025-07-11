@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centros de Eventos VERANUM - Tu Evento Ideal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', // Azul primario
+                        secondary: '#60A5FA', // Azul secundario
+                        dark: '#1F2937', // Texto oscuro
+                        light: '#F3F4F6', // Fondo claro
+                        accent: '#EF4444', // Acento/errores
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                        veranumDarkGreen: '#388E3C', // Verde oscuro para texto/botones
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .event-center-card {
+            background-color: theme('colors.white');
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            overflow: hidden;
+            border: 1px solid theme('colors.gray.200');
+            display: flex;
+            flex-direction: column;
+        }
+        .event-center-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .event-center-card-details {
+            padding: 1.5rem; /* p-6 */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark">
+
+    <header class="bg-white shadow-md p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://placehold.co/100x40/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-10 w-auto mr-4 rounded-md">
+                <h1 class="text-2xl font-bold text-veranumDarkGreen">Hoteles VERANUM</h1>
+            </div>
+            <ul class="flex space-x-6">
+                <li><a href="index.html" class="text-gray-700 hover:text-veranumGreen font-medium">Inicio</a></li>
+                <li><a id="navHotels" href="hotels.html" class="text-gray-700 hover:text-veranumGreen font-medium">Hoteles</a></li>
+                <li><a id="navPromos" href="promotions.html" class="text-gray-700 hover:text-veranumGreen font-medium">Promociones</a></li>
+                <li><a id="navCenters" href="event_centers.html" class="text-veranumGreen font-bold border-b-2 border-veranumGreen pb-1">Centro de Eventos</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Contacto</a></li>
+                <li><a href="login.html" class="text-veranumGreen hover:text-veranumDarkGreen font-bold px-3 py-1 border border-veranumGreen rounded-md transition duration-150">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-veranumDarkGreen mb-8 text-center">Nuestros Centros de Eventos VERANUM</h2>
+
+        <div id="centerCardList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- dinámico -->
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <div class="mb-4 md:mb-0">
+                <p>&copy; 2025 Hoteles VERANUM. Todos los derechos reservados.</p>
+            </div>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-veranumGreen">Política de Privacidad</a>
+                <a href="#" class="hover:text-veranumGreen">Términos y Condiciones</a>
+                <a href="#" class="hover:text-veranumGreen">Contáctanos</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            const HOTEL_KEY='VERANUM_HOTELS';
+            const PROMO_KEY='VERANUM_PROMOTIONS';
+            const CENTER_KEY='VERANUM_EVENT_CENTERS';
+
+            const getHotels=()=>JSON.parse(localStorage.getItem(HOTEL_KEY)||'[]');
+            const getPromos=()=>JSON.parse(localStorage.getItem(PROMO_KEY)||'[]');
+            const getCenters=()=>JSON.parse(localStorage.getItem(CENTER_KEY)||'[]');
+
+            const updateNavCounts=()=>{
+                const h=getHotels().length;
+                const p=getPromos().filter(pr=>pr.approved).length;
+                const c=getCenters().length;
+                document.getElementById('navHotels').textContent=`Hoteles (${h})`;
+                document.getElementById('navPromos').textContent=`Promociones (${p})`;
+                document.getElementById('navCenters').textContent=`Centro de Eventos (${c})`;
+            };
+
+            const centerCardList=document.getElementById('centerCardList');
+            const renderCenterCard=(c)=>{
+                if(!centerCardList) return;
+                const img='https://placehold.co/600x400/4CAF50/ffffff?text=Centro';
+                const html=`
+                    <div class="event-center-card">
+                        <img src="${img}" alt="${c.name}" class="event-center-card-image">
+                        <div class="event-center-card-details">
+                            <div>
+                                <h3 class="text-2xl font-bold text-veranumDarkGreen mb-2">${c.name}</h3>
+                                <p class="text-gray-700 mb-3">Hotel: ${c.hotel}</p>
+                                <p class="text-gray-600 text-sm mb-4"><span class="font-medium">Capacidad:</span> ${c.capacity} personas<br>
+                                    <span class="font-medium">Precio hora:</span> ${Number(c.price).toLocaleString('es-CL')} CLP</p>
+                                <p class="text-gray-600 text-sm">${c.desc||''}</p>
+                            </div>
+                            <button onclick="alert('Para reservar, dirígete al hotel correspondiente.')"
+                                    class="mt-4 bg-veranumGreen text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-veranumDarkGreen transition duration-300">
+                                Consultar Disponibilidad
+                            </button>
+                        </div>
+                    </div>`;
+                centerCardList.insertAdjacentHTML('beforeend',html);
+            };
+
+            const refreshCenterList=()=>{
+                if(centerCardList) centerCardList.innerHTML='';
+                getCenters().forEach(renderCenterCard);
+            };
+
+            const ensureSampleCenters = ()=>{
+                let centers = getCenters();
+                if(centers.length >= 2) return;
+
+                const sample=[
+                    {
+                        id: Date.now(),
+                        name: 'Terraza Panorámica VERANUM',
+                        hotel: 'VERANUM V Región',
+                        capacity: 150,
+                        price: 120000,
+                        desc: 'Vistas espectaculares al mar, perfecta para cócteles y eventos al aire libre.'
+                    },
+                    {
+                        id: Date.now()+1,
+                        name: 'Salón Andes',
+                        hotel: 'VERANUM Santiago',
+                        capacity: 250,
+                        price: 180000,
+                        desc: 'Espacio modular para congresos y convenciones corporativas.'
+                    }
+                ];
+                centers=[...centers,...sample];
+                localStorage.setItem(CENTER_KEY,JSON.stringify(centers));
+            };
+
+            ensureSampleCenters();
+
+            updateNavCounts();
+            refreshCenterList();
+
+            window.addEventListener('storage',e=>{
+                if([HOTEL_KEY,PROMO_KEY,CENTER_KEY].includes(e.key)) updateNavCounts();
+                if(e.key===CENTER_KEY) refreshCenterList();
+            });
+        });
+    </script>
+</body>
+</html>

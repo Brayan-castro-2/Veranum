@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmar Reserva - Hoteles VERANUM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6', // Azul primario
+                        secondary: '#60A5FA', // Azul secundario
+                        dark: '#1F2937', // Texto oscuro
+                        light: '#F3F4F6', // Fondo claro
+                        accent: '#EF4444', // Acento/errores
+                        veranumGreen: '#4CAF50', // Verde vibrante
+                        veranumLightGreen: '#8BC34A', // Verde más claro
+                        veranumDarkGreen: '#388E3C', // Verde oscuro para texto/botones
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .summary-card {
+            background-color: theme('colors.white');
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            padding: 1.5rem; /* p-6 */
+            border: 1px solid theme('colors.gray.200');
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark">
+
+    <header class="bg-white shadow-md p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="https://placehold.co/100x40/AEC966/ffffff?text=VERANUM" alt="Logo de VERANUM" class="h-10 w-auto mr-4 rounded-md">
+                <h1 class="text-2xl font-bold text-veranumDarkGreen">Hoteles VERANUM</h1>
+            </div>
+            <ul class="flex space-x-6">
+                <li><a href="index.html" class="text-gray-700 hover:text-veranumGreen font-medium">Inicio</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Hoteles</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Promociones</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Centro de Eventos</a></li>
+                <li><a href="#" class="text-gray-700 hover:text-veranumGreen font-medium">Contacto</a></li>
+                <li><a href="login.html" class="text-veranumGreen hover:text-veranumDarkGreen font-bold px-3 py-1 border border-veranumGreen rounded-md transition duration-150">Iniciar Sesión</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-veranumDarkGreen mb-8 text-center">Confirmar tu Reserva</h2>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-1 summary-card h-fit">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Resumen de tu Selección</h3>
+                <img id="roomImage" src="https://placehold.co/400x250/AEC966/ffffff?text=Tu+Habitacion" alt="Imagen de la habitación seleccionada" class="w-full h-40 object-cover rounded-md mb-4">
+                <p class="text-lg font-bold text-veranumDarkGreen" id="roomName">Habitación Seleccionada</p>
+                <p class="text-gray-700 text-sm mb-2" id="hotelName">Hotel VERANUM [Ubicación]</p>
+                <p class="text-gray-600 text-sm mb-1"><span class="font-medium">Check-in:</span> <span id="summaryCheckIn">--</span></p>
+                <p class="text-gray-600 text-sm mb-1"><span class="font-medium">Check-out:</span> <span id="summaryCheckOut">--</span></p>
+                <p class="text-gray-600 text-sm mb-1"><span class="font-medium">Noches:</span> <span id="summaryNights">--</span></p>
+                <p class="text-gray-600 text-sm mb-4"><span class="font-medium">Huéspedes:</span> <span id="summaryGuests">--</span></p>
+                
+                <hr class="my-4">
+
+                <h4 class="text-md font-semibold text-gray-800 mb-3">Servicios Extras Opcionales:</h4>
+                <div class="space-y-2 mb-4">
+                    <label class="flex items-center text-gray-700">
+                        <input type="checkbox" name="extraServices" value="gimnasio" data-price="5000" class="form-checkbox h-4 w-4 text-veranumGreen rounded">
+                        <span class="ml-2">Acceso a Gimnasio (+CLP 5.000/noche)</span>
+                    </label>
+                    <label class="flex items-center text-gray-700">
+                        <input type="checkbox" name="extraServices" value="estacionamiento" data-price="8000" class="form-checkbox h-4 w-4 text-veranumGreen rounded">
+                        <span class="ml-2">Estacionamiento Privado (+CLP 8.000/noche)</span>
+                    </label>
+                    <label class="flex items-center text-gray-700">
+                        <input type="checkbox" name="extraServices" value="desayuno_premium" data-price="10000" class="form-checkbox h-4 w-4 text-veranumGreen rounded">
+                        <span class="ml-2">Desayuno Premium (+CLP 10.000/noche por persona)</span>
+                    </label>
+                    <label class="flex items-center text-gray-700">
+                        <input type="checkbox" name="extraServices" value="late_checkout" data-price="15000" class="form-checkbox h-4 w-4 text-veranumGreen rounded">
+                        <span class="ml-2">Late Check-out (+CLP 15.000/estancia)</span>
+                    </label>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="space-y-2">
+                    <p class="flex justify-between text-gray-700"><span>Precio por Noche:</span> <span id="basePricePerNight">CLP 0</span></p>
+                    <p class="flex justify-between text-gray-700"><span>Subtotal Habitación:</span> <span id="roomSubtotal">CLP 0</span></p>
+                    <p class="flex justify-between text-gray-700"><span>Servicios Extras:</span> <span id="extraServicesTotal">CLP 0</span></p>
+                    <p class="flex justify-between text-2xl font-bold text-veranumDarkGreen"><span>Total a Pagar:</span> <span id="finalTotalPrice">CLP 0</span></p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 summary-card">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Datos del Pasajero Principal (RF4)</h3>
+                <form id="bookingForm" class="space-y-6">
+                    <div>
+                        <label for="fullName" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                        <input type="text" id="fullName" name="fullName" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen">
+                    </div>
+                    <div>
+                        <label for="identification" class="block text-sm font-medium text-gray-700">Identificación (RUT/DNI)</label>
+                        <input type="text" id="identification" name="identification" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen">
+                    </div>
+                    <div>
+                        <label for="age" class="block text-sm font-medium text-gray-700">Edad</label>
+                        <input type="number" id="age" name="age" min="18" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                        <input type="email" id="email" name="email" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                        <input type="tel" id="phone" name="phone" required
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-veranumGreen focus:border-veranumGreen">
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <button type="submit"
+                                class="bg-veranumGreen text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-veranumDarkGreen transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-veranumGreen">
+                            Confirmar Reserva
+                        </button>
+                    </div>
+                    <div id="bookingMessage" class="mt-4 text-sm font-medium text-center text-red-600 hidden"></div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center md:flex md:justify-between md:items-center">
+            <div class="mb-4 md:mb-0">
+                <p>&copy; 2025 Hoteles VERANUM. Todos los derechos reservados.</p>
+            </div>
+            <div class="flex justify-center space-x-6">
+                <a href="#" class="hover:text-veranumGreen">Política de Privacidad</a>
+                <a href="#" class="hover:text-veranumGreen">Términos y Condiciones</a>
+                <a href="#" class="hover:text-veranumGreen">Contáctanos</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomId = parseInt(urlParams.get('roomId')) || null;
+            const checkIn = urlParams.get('checkIn');
+            const checkOut = urlParams.get('checkOut');
+            const roomType = urlParams.get('roomType') || 'Habitación';
+            const roomPrice = parseFloat(urlParams.get('price')) || 85000; // Default price for prototyping
+            const guests = parseInt(urlParams.get('guests')) || 2; // Default guests for prototyping
+
+            let numberOfNights = 0;
+            if (checkIn && checkOut) {
+                const date1 = new Date(checkIn);
+                const date2 = new Date(checkOut);
+                const diffTime = Math.abs(date2 - date1);
+                numberOfNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+
+            // Display reservation summary
+            document.getElementById('roomName').textContent = roomType;
+            document.getElementById('summaryCheckIn').textContent = checkIn || 'N/A';
+            document.getElementById('summaryCheckOut').textContent = checkOut || 'N/A';
+            document.getElementById('summaryNights').textContent = numberOfNights;
+            document.getElementById('summaryGuests').textContent = guests;
+            document.getElementById('basePricePerNight').textContent = `CLP ${roomPrice.toLocaleString('es-CL')}`;
+
+            const extraServicesCheckboxes = document.querySelectorAll('input[name="extraServices"]');
+            const roomSubtotalSpan = document.getElementById('roomSubtotal');
+            const extraServicesTotalSpan = document.getElementById('extraServicesTotal');
+            const finalTotalPriceSpan = document.getElementById('finalTotalPrice');
+            const bookingForm = document.getElementById('bookingForm');
+            const bookingMessage = document.getElementById('bookingMessage');
+
+            function calculateTotalPrice() {
+                let currentExtraServicesTotal = 0;
+                extraServicesCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        let servicePrice = parseFloat(checkbox.dataset.price);
+                        if (checkbox.value === 'desayuno_premium') {
+                            currentExtraServicesTotal += (servicePrice * numberOfNights * guests); // Price per night per person
+                        } else if (checkbox.value === 'late_checkout') {
+                             currentExtraServicesTotal += servicePrice; // Flat rate per stay
+                        } else {
+                            currentExtraServicesTotal += (servicePrice * numberOfNights); // Price per night
+                        }
+                    }
+                });
+
+                const roomTotalPrice = roomPrice * numberOfNights;
+                const total = roomTotalPrice + currentExtraServicesTotal;
+
+                roomSubtotalSpan.textContent = `CLP ${roomTotalPrice.toLocaleString('es-CL')}`;
+                extraServicesTotalSpan.textContent = `CLP ${currentExtraServicesTotal.toLocaleString('es-CL')}`;
+                finalTotalPriceSpan.textContent = `CLP ${total.toLocaleString('es-CL')}`;
+            }
+
+            // Initial calculation
+            calculateTotalPrice();
+
+            // Recalculate when extra services are checked/unchecked
+            extraServicesCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', calculateTotalPrice);
+            });
+
+            // --- Persistencia de Reservas ---
+            const RES_KEY='VERANUM_RESERVATIONS';
+            const getReservations=()=>JSON.parse(localStorage.getItem(RES_KEY)||'[]');
+            const saveReservations=arr=>localStorage.setItem(RES_KEY,JSON.stringify(arr));
+            const isAvailable=(rid,from,to)=>{
+                if(!rid) return true;
+                const fromD=new Date(from);const toD=new Date(to);
+                return getReservations().filter(r=>r.roomId===rid).every(r=>{
+                    const s=new Date(r.checkIn);const e=new Date(r.checkOut);
+                    return (toD<=s)||(fromD>=e);
+                });
+            };
+
+            // Handle form submission
+            bookingForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+
+                // Basic form validation (client-side)
+                if (!bookingForm.checkValidity()) {
+                    bookingMessage.textContent = 'Por favor, completa todos los campos requeridos.';
+                    bookingMessage.classList.remove('hidden');
+                    return;
+                }
+
+                // Hide previous message
+                bookingMessage.classList.add('hidden');
+
+                const fullName = document.getElementById('fullName').value;
+                const identification = document.getElementById('identification').value;
+                const age = document.getElementById('age').value;
+                const email = document.getElementById('email').value;
+                const phone = document.getElementById('phone').value;
+                const finalPrice = finalTotalPriceSpan.textContent;
+                const selectedServices = Array.from(extraServicesCheckboxes)
+                                            .filter(cb => cb.checked)
+                                            .map(cb => cb.value);
+
+                // Comprobar disponibilidad antes de guardar
+                if(checkIn && checkOut && roomId!==null && !isAvailable(roomId,checkIn,checkOut)){
+                    bookingMessage.textContent = 'La habitación seleccionada ya está ocupada para esas fechas.';
+                    bookingMessage.classList.remove('hidden');
+                    return;
+                }
+
+                // Guardar reserva
+                const newRes={
+                    id: Date.now(),
+                    roomId,
+                    roomType,
+                    checkIn,
+                    checkOut,
+                    guests,
+                    fullName,
+                    identification,
+                    age,
+                    email,
+                    phone,
+                    selectedServices,
+                    finalPrice,
+                };
+                const allRes=getReservations();
+                allRes.push(newRes);
+                saveReservations(allRes);
+
+                console.log('Reserva guardada', newRes);
+ 
+                alert('¡Reserva confirmada y guardada localmente!');
+                window.location.href='confirmation.html';
+            });
+        });
+    </script>
+</body>
+</html>

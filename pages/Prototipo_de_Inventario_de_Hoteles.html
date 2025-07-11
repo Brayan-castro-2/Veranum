@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Inventario de Hoteles</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Inventario de Hoteles VERANUM</h1>
+
+        <!-- Sección para añadir un nuevo hotel -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Añadir Nuevo Hotel</h2>
+            <form id="addHotelForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="hotelName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Hotel</label>
+                    <input type="text" id="hotelName" name="hotelName" placeholder="Hotel VERANUM Santiago" required>
+                </div>
+                <div>
+                    <label for="hotelLocation" class="block text-gray-700 text-sm font-medium mb-2">Ubicación</label>
+                    <input type="text" id="hotelLocation" name="hotelLocation" placeholder="Santiago, Chile" required>
+                </div>
+                <div>
+                    <label for="roomCount" class="block text-gray-700 text-sm font-medium mb-2">Cantidad de Habitaciones</label>
+                    <input type="number" id="roomCount" name="roomCount" min="1" value="10" required>
+                </div>
+                <div>
+                    <label for="extraServices" class="block text-gray-700 text-sm font-medium mb-2">Servicios Extras (separados por coma)</label>
+                    <input type="text" id="extraServices" name="extraServices" placeholder="Gimnasio, Piscina, Spa">
+                </div>
+                <div class="md:col-span-2">
+                    <label for="description" class="block text-gray-700 text-sm font-medium mb-2">Descripción</label>
+                    <textarea id="description" name="description" rows="3" placeholder="Breve descripción del hotel y sus comodidades."></textarea>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Guardar Hotel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección para mostrar la lista de hoteles -->
+        <div>
+            <h2 class="text-2xl font-semibold text-dark mb-4">Hoteles Registrados</h2>
+            <div id="hotelList" class="space-y-4">
+                <!-- Los hoteles se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Funciones para mostrar y ocultar mensajes (hechas globales para el onclick)
+        window.showMessage = function(message) {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            if (messageBox && messageText) {
+                messageText.innerText = message;
+                messageBox.classList.remove('hidden');
+            }
+        }
+
+        window.hideMessage = function() {
+            const messageBox = document.getElementById('messageBox');
+            if (messageBox) {
+                messageBox.classList.add('hidden');
+            }
+        }
+
+        // --- Lógica de persistencia para Hoteles ---
+        const STORAGE_KEY = 'VERANUM_HOTELS'; // Clave única para localStorage
+
+        // Variable para controlar modo edición
+        let editingHotelId = null;
+
+        // Función para obtener hoteles de localStorage
+        function getHotels() {
+            const hotelsJson = localStorage.getItem(STORAGE_KEY);
+            return hotelsJson ? JSON.parse(hotelsJson) : [];
+        }
+
+        // Función para guardar hoteles en localStorage
+        function saveHotels(hotels) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(hotels));
+        }
+
+        // Función para renderizar un hotel en la lista
+        function renderHotel(hotel) {
+            const hotelListDiv = document.getElementById('hotelList');
+            if (hotelListDiv) {
+                const newHotelHtml = `
+                    <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center mb-4" data-id="${hotel.id}">
+                        <div>
+                            <h3 class="text-lg font-semibold text-dark">${hotel.hotelName}</h3>
+                            <p class="text-gray-600 text-sm">Ubicación: ${hotel.hotelLocation} | Habitaciones: ${hotel.roomCount}</p>
+                            <p class="text-gray-600 text-xs mt-1">Servicios Extra: ${hotel.extraServices || 'N/A'}</p>
+                            <p class="text-gray-600 text-xs">Descripción: ${hotel.description || 'Sin descripción.'}</p>
+                        </div>
+                        <button class="edit-hotel mt-3 md:mt-0 bg-blue-100 text-primary py-1 px-4 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                    </div>`;
+                hotelListDiv.insertAdjacentHTML('afterbegin', newHotelHtml); // Añade al inicio de la lista
+            }
+        }
+
+        // Cargar y mostrar hoteles al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            let hotels = getHotels();
+            if (hotels.length === 0) {
+                const sampleHotels = [
+                    {
+                        id: Date.now() + 1,
+                        hotelName: 'VERANUM Santiago',
+                        hotelLocation: 'Santiago, Chile',
+                        roomCount: 120,
+                        extraServices: 'Piscina, Gimnasio, Restaurante Gourmet',
+                        description: 'Ubicado en el centro de Santiago, perfecto para viajes de negocios y turismo.'
+                    },
+                    {
+                        id: Date.now() + 2,
+                        hotelName: 'VERANUM V Región',
+                        hotelLocation: 'Viña del Mar, Chile',
+                        roomCount: 80,
+                        extraServices: 'Spa, Playa privada, Restaurante con vista al mar',
+                        description: 'Un refugio costero con vistas inigualables del Pacífico.'
+                    },
+                    {
+                        id: Date.now() + 3,
+                        hotelName: 'VERANUM Patagonia',
+                        hotelLocation: 'Puerto Varas, Chile',
+                        roomCount: 60,
+                        extraServices: 'Tours de aventura, Piscina climatizada',
+                        description: 'Conéctate con la naturaleza en el sur de Chile.'
+                    },
+                    {
+                        id: Date.now() + 4,
+                        hotelName: 'VERANUM Desierto',
+                        hotelLocation: 'San Pedro de Atacama, Chile',
+                        roomCount: 50,
+                        extraServices: 'Observatorio astronómico, Spa, Excursiones al desierto',
+                        description: 'Experiencia única bajo los cielos más despejados del mundo.'
+                    },
+                    {
+                        id: Date.now() + 5,
+                        hotelName: 'VERANUM Andes',
+                        hotelLocation: 'Portillo, Chile',
+                        roomCount: 70,
+                        extraServices: 'Centro de esquí, Piscina climatizada',
+                        description: 'El destino ideal para los amantes de los deportes de invierno.'
+                    }
+                ];
+                hotels = sampleHotels;
+                saveHotels(hotels);
+            }
+            hotels.forEach(renderHotel);
+
+            // Simulación de añadir un hotel
+            const addHotelForm = document.getElementById('addHotelForm');
+            if (addHotelForm) {
+                // Delegación para botón Editar
+                document.getElementById('hotelList')?.addEventListener('click', e => {
+                    if (e.target.classList.contains('edit-hotel')) {
+                        const container = e.target.closest('[data-id]');
+                        const id = Number(container.dataset.id);
+                        const hotelsArr = getHotels();
+                        const hot = hotelsArr.find(h => h.id === id);
+                        if (hot) {
+                            document.getElementById('hotelName').value = hot.hotelName;
+                            document.getElementById('hotelLocation').value = hot.hotelLocation;
+                            document.getElementById('roomCount').value = hot.roomCount;
+                            document.getElementById('extraServices').value = hot.extraServices || '';
+                            document.getElementById('description').value = hot.description || '';
+                            editingHotelId = id;
+                            addHotelForm.querySelector('button[type="submit"]').innerText = 'Guardar Cambios';
+                        }
+                    }
+                });
+
+                addHotelForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const hotelName = document.getElementById('hotelName').value;
+                    const hotelLocation = document.getElementById('hotelLocation').value;
+                    const roomCount = document.getElementById('roomCount').value;
+                    const extraServices = document.getElementById('extraServices').value;
+                    const description = document.getElementById('description').value;
+
+                    if (!hotelName || !hotelLocation || !roomCount) {
+                        window.showMessage('Por favor, completa los campos obligatorios: Nombre, Ubicación y Nº Habitaciones.');
+                        return;
+                    }
+
+                    let hotels = getHotels();
+
+                    if (editingHotelId) {
+                        const idx = hotels.findIndex(h => h.id === editingHotelId);
+                        if (idx > -1) {
+                            hotels[idx] = { ...hotels[idx], hotelName, hotelLocation, roomCount: parseInt(roomCount), extraServices, description };
+                            saveHotels(hotels);
+                            document.getElementById('hotelList').innerHTML = '';
+                            hotels.slice().reverse().forEach(renderHotel);
+                            window.showMessage(`Hotel "${hotelName}" actualizado.`);
+                        }
+                        editingHotelId = null;
+                        addHotelForm.querySelector('button[type="submit"]').innerText = 'Guardar Hotel';
+                    } else {
+                        const newHotel = {
+                            id: Date.now(),
+                            hotelName,
+                            hotelLocation,
+                            roomCount: parseInt(roomCount),
+                            extraServices,
+                            description
+                        };
+                        hotels.push(newHotel);
+                        saveHotels(hotels);
+                        renderHotel(newHotel);
+                        window.showMessage(`Hotel "${hotelName}" guardado.`);
+                    }
+
+                    addHotelForm.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

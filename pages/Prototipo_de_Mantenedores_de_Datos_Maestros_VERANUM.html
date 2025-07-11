@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Mantenedores de Datos Maestros</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        select {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="tel"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        /* Estilos para pestañas */
+        .tab-button {
+            padding: 0.75rem 1.25rem;
+            border-radius: theme('borderRadius.md');
+            background-color: theme('colors.gray.200');
+            color: theme('colors.gray.700');
+            font-weight: theme('fontWeight.medium');
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .tab-button.active {
+            background-color: theme('colors.primary');
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Mantenedores de Datos Maestros VERANUM</h1>
+
+        <!-- Pestañas de Navegación para Mantenedores -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button class="tab-button active" onclick="window.showTab('users')">Usuarios</button>
+            <button class="tab-button" onclick="window.showTab('clients')">Clientes</button>
+            <button class="tab-button" onclick="window.showTab('providers')">Proveedores</button>
+            <button class="tab-button" onclick="window.showTab('itemTypes')">Tipos de Insumos</button>
+            <button class="tab-button" onclick="window.showTab('cities')">Ciudades</button>
+            <button class="tab-button" onclick="window.showTab('countries')">Países</button>
+        </div>
+
+        <!-- Contenido de las Pestañas -->
+
+        <!-- Pestaña: Usuarios -->
+        <div id="usersTab" class="tab-content active p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Usuarios</h2>
+            <form id="addUserForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="userName" class="block text-gray-700 text-sm font-medium mb-2">Nombre Completo</label>
+                    <input type="text" id="userName" name="userName" placeholder="Nombre Apellido" required>
+                </div>
+                <div>
+                    <label for="userEmail" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="userEmail" name="userEmail" placeholder="usuario@veranum.cl" required>
+                </div>
+                <div>
+                    <label for="userRole" class="block text-gray-700 text-sm font-medium mb-2">Rol</label>
+                    <select id="userRole" name="userRole" required>
+                        <option value="">Selecciona un rol</option>
+                        <option value="Administrador">Administrador</option>
+                        <option value="Recepcionista">Recepcionista</option>
+                        <option value="Gerente">Gerente</option>
+                        <option value="Restaurante">Personal de Restaurante</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="userPassword" class="block text-gray-700 text-sm font-medium mb-2">Contraseña (inicial)</label>
+                    <input type="text" id="userPassword" name="userPassword" placeholder="Contraseña temporal" required>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Añadir Usuario
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Usuarios Registrados</h3>
+                <div id="userList" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña: Clientes -->
+        <div id="clientsTab" class="tab-content p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Clientes</h2>
+            <form id="addClientForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="clientFullName" class="block text-gray-700 text-sm font-medium mb-2">Nombre Completo</label>
+                    <input type="text" id="clientFullName" name="clientFullName" placeholder="Maria González" required>
+                </div>
+                <div>
+                    <label for="clientEmail" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="clientEmail" name="clientEmail" placeholder="maria.g@example.com" required>
+                </div>
+                <div>
+                    <label for="clientPhone" class="block text-gray-700 text-sm font-medium mb-2">Teléfono</label>
+                    <input type="tel" id="clientPhone" name="clientPhone" placeholder="+56 9 12345678">
+                </div>
+                <div>
+                    <label for="clientDNI" class="block text-gray-700 text-sm font-medium mb-2">DNI/Pasaporte</label>
+                    <input type="text" id="clientDNI" name="clientDNI" placeholder="12.345.678-9">
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Añadir Cliente
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Clientes Registrados</h3>
+                <div id="clientList" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña: Proveedores -->
+        <div id="providersTab" class="tab-content p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Proveedores</h2>
+            <form id="addProviderForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="providerCompany" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Proveedor</label>
+                    <input type="text" id="providerCompany" name="providerCompany" placeholder="Distr. Alimentos S.A." required>
+                </div>
+                <div>
+                    <label for="providerContact" class="block text-gray-700 text-sm font-medium mb-2">Contacto</label>
+                    <input type="text" id="providerContact" name="providerContact" placeholder="Juan Soto (Ventas)">
+                </div>
+                <div>
+                    <label for="providerPhone" class="block text-gray-700 text-sm font-medium mb-2">Teléfono</label>
+                    <input type="tel" id="providerPhone" name="providerPhone" placeholder="+56 2 98765432">
+                </div>
+                <div>
+                    <label for="providerEmail" class="block text-gray-700 text-sm font-medium mb-2">Email</label>
+                    <input type="email" id="providerEmail" name="providerEmail" placeholder="contacto@distribuidora.cl">
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Añadir Proveedor
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Proveedores Registrados</h3>
+                <div id="providerList" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña: Tipos de Insumos -->
+        <div id="itemTypesTab" class="tab-content p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Tipos de Insumos</h2>
+            <form id="addItemTypeForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="itemTypeName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Tipo de Insumo</label>
+                    <input type="text" id="itemTypeName" name="itemTypeName" placeholder="Ej: Lácteos, Vegetales, Carnes" required>
+                </div>
+                <div>
+                    <label for="itemTypeUnit" class="block text-gray-700 text-sm font-medium mb-2">Unidad Predeterminada</label>
+                    <select id="itemTypeUnit" name="itemTypeUnit" required>
+                        <option value="kg">Kilogramos (kg)</option>
+                        <option value="litros">Litros</option>
+                        <option value="unidades">Unidades</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Añadir Tipo de Insumo
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Tipos de Insumos Registrados</h3>
+                <div id="itemTypeList" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña: Ciudades -->
+        <div id="citiesTab" class="tab-content p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Ciudades</h2>
+            <form id="addCityForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="cityName" class="block text-gray-700 text-sm font-medium mb-2">Nombre de la Ciudad</label>
+                    <input type="text" id="cityName" name="cityName" placeholder="Ej: Santiago, Valparaíso" required>
+                </div>
+                <div>
+                    <label for="cityCountry" class="block text-gray-700 text-sm font-medium mb-2">País</label>
+                    <input type="text" id="cityCountry" name="cityCountry" placeholder="Chile" required>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Añadir Ciudad
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Ciudades Registradas</h3>
+                <div id="cityList" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- Pestaña: Países -->
+        <div id="countriesTab" class="tab-content p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Gestión de Países</h2>
+            <form id="addCountryForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="countryName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del País</label>
+                    <input type="text" id="countryName" name="countryName" placeholder="Ej: Chile, Argentina" required>
+                </div>
+                <div>
+                    <label for="countryCode" class="block text-gray-700 text-sm font-medium mb-2">Código (ISO 2)</label>
+                    <input type="text" id="countryCode" name="countryCode" placeholder="CL, AR" maxlength="2" required>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Añadir País
+                    </button>
+                </div>
+            </form>
+            <div class="mt-8">
+                <h3 class="text-xl font-semibold text-dark mb-3">Países Registrados</h3>
+                <div id="countryList" class="space-y-3">
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Helpers mensajes
+        window.showMessage = (m)=>{const b=document.getElementById('messageBox');const t=document.getElementById('messageText');if(b&&t){t.innerText=m;b.classList.remove('hidden')}};
+        window.hideMessage = ()=>document.getElementById('messageBox')?.classList.add('hidden');
+
+        // --- Claves de almacenamiento ---
+        const KEYS = {
+            users: 'VERANUM_USERS',
+            clients: 'VERANUM_CLIENTS',
+            providers: 'VERANUM_PROVIDERS',
+            countries: 'VERANUM_COUNTRIES'
+        };
+        let editingClientId = null; // <-- variable cliente
+        let editingUserId = null;   // <-- NUEVA VARIABLE para usuario en edición
+        const getData = (k)=>JSON.parse(localStorage.getItem(k)||'[]');
+        const saveData = (k,arr)=>localStorage.setItem(k,JSON.stringify(arr));
+
+        // Renderers
+        const renderUser = (u)=>{
+            document.getElementById('userList')?.insertAdjacentHTML('afterbegin',`
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center mb-2" data-id="${u.id}">
+                    <div><p class="font-semibold text-dark">${u.name}</p><p class="text-gray-600 text-xs">${u.email} | ${u.role}</p></div>
+                    <button class="edit-user bg-blue-100 text-primary py-1 px-3 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                </div>`);
+        };
+        const renderClient = (c)=>{
+            document.getElementById('clientList')?.insertAdjacentHTML('afterbegin',`
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center mb-2" data-id="${c.id}">
+                    <div><p class="font-semibold text-dark">${c.fullName}</p><p class="text-gray-600 text-xs">${c.email} | ${c.phone}</p></div>
+                    <button class="edit-client bg-blue-100 text-primary py-1 px-3 rounded-md text-sm hover:bg-blue-200">Editar</button>
+                </div>`);
+        };
+        const renderProvider = (p)=>{
+            document.getElementById('providerList')?.insertAdjacentHTML('afterbegin',`
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center mb-2">
+                    <div><p class="font-semibold text-dark">${p.companyName}</p><p class="text-gray-600 text-xs">${p.contactEmail}</p></div>
+                </div>`);
+        };
+        const renderCountry = (c)=>{
+            document.getElementById('countryList')?.insertAdjacentHTML('afterbegin',`
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 flex justify-between items-center mb-2">
+                    <div><p class="font-semibold text-dark">${c.countryName}</p><p class="text-gray-600 text-xs">Código: ${c.countryCode}</p></div>
+                </div>`);
+        };
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            // Cargar existentes
+            getData(KEYS.users).forEach(renderUser);
+            getData(KEYS.clients).forEach(renderClient);
+            getData(KEYS.providers).forEach(renderProvider);
+            getData(KEYS.countries).forEach(renderCountry);
+
+            // Usuarios
+            const userForm=document.getElementById('addUserForm');
+
+            // Delegación para botón Editar en lista usuarios
+            document.getElementById('userList')?.addEventListener('click',e=>{
+                if(e.target.classList.contains('edit-user')){
+                    const cont=e.target.closest('[data-id]');
+                    const id=Number(cont.dataset.id);
+                    const arr=getData(KEYS.users);
+                    const usr=arr.find(u=>u.id===id);
+                    if(usr){
+                        document.getElementById('userName').value=usr.name;
+                        document.getElementById('userEmail').value=usr.email;
+                        document.getElementById('userRole').value=usr.role;
+                        document.getElementById('userPassword').value=usr.password;
+                        editingUserId=id;
+                        userForm.querySelector('button[type="submit"]').innerText='Guardar Cambios';
+                    }
+                }
+            });
+
+            userForm?.addEventListener('submit',e=>{
+                e.preventDefault();
+                const name=document.getElementById('userName').value;
+                const email=document.getElementById('userEmail').value;
+                const role=document.getElementById('userRole').value;
+                const password=document.getElementById('userPassword').value;
+                if(!name||!email){window.showMessage('Completa nombre y email');return;}
+                const arr=getData(KEYS.users);
+                if(editingUserId){
+                    const idx=arr.findIndex(u=>u.id===editingUserId);
+                    if(idx>-1){
+                        arr[idx]={...arr[idx],name,email,role,password};
+                        saveData(KEYS.users,arr);
+                        document.getElementById('userList').innerHTML='';
+                        arr.slice().reverse().forEach(renderUser); // mantener orden reciente arriba
+                        editingUserId=null;
+                        userForm.querySelector('button[type="submit"]').innerText='Añadir Usuario';
+                        window.showMessage('Usuario actualizado');
+                    }
+                }else{
+                    const newU={id:Date.now(),name,email,role,password};
+                    arr.push(newU);
+                    saveData(KEYS.users,arr);
+                    renderUser(newU);
+                    window.showMessage('Usuario guardado');
+                }
+                userForm.reset();
+            });
+
+            // Clientes
+            const clientForm=document.getElementById('addClientForm');
+            
+            // Delegación para botón Editar en la lista de clientes
+            document.getElementById('clientList')?.addEventListener('click',e=>{
+                if(e.target.classList.contains('edit-client')){
+                    const container=e.target.closest('[data-id]');
+                    const id=Number(container.dataset.id);
+                    const arr=getData(KEYS.clients);
+                    const cli=arr.find(c=>c.id===id);
+                    if(cli){
+                        document.getElementById('clientFullName').value=cli.fullName;
+                        document.getElementById('clientEmail').value=cli.email;
+                        document.getElementById('clientPhone').value=cli.phone;
+                        editingClientId=id;
+                        clientForm.querySelector('button[type="submit"]').innerText='Guardar Cambios';
+                    }
+                }
+            });
+
+            clientForm?.addEventListener('submit',e=>{
+                e.preventDefault();
+                const fullName=document.getElementById('clientFullName').value;
+                const email=document.getElementById('clientEmail').value;
+                const phone=document.getElementById('clientPhone').value;
+                const arr=getData(KEYS.clients);
+
+                if(editingClientId){
+                    const idx=arr.findIndex(c=>c.id===editingClientId);
+                    if(idx>-1){
+                        arr[idx]={...arr[idx],fullName,email,phone};
+                        saveData(KEYS.clients,arr);
+                        document.getElementById('clientList').innerHTML='';
+                        arr.forEach(renderClient);
+                        editingClientId=null;
+                        clientForm.querySelector('button[type="submit"]').innerText='Añadir Cliente';
+                        window.showMessage('Cliente actualizado');
+                    }
+                }else{
+                    const newC={id:Date.now(),fullName,email,phone};
+                    arr.push(newC);
+                    saveData(KEYS.clients,arr);
+                    renderClient(newC);
+                    window.showMessage('Cliente guardado');
+                }
+                clientForm.reset();
+            });
+
+            // Proveedores
+            const providerForm=document.getElementById('addProviderForm');
+            providerForm?.addEventListener('submit',e=>{
+                e.preventDefault();
+                const companyName=document.getElementById('providerCompany').value;
+                const contactEmail=document.getElementById('providerEmail').value;
+                const newP={id:Date.now(),companyName,contactEmail};
+                const arr=getData(KEYS.providers);arr.push(newP);saveData(KEYS.providers,arr);renderProvider(newP);providerForm.reset();window.showMessage('Proveedor guardado');
+            });
+
+            // Países
+            const countryForm=document.getElementById('addCountryForm');
+            countryForm?.addEventListener('submit',e=>{
+                e.preventDefault();
+                const countryName=document.getElementById('countryName').value;
+                const countryCode=document.getElementById('countryCode').value;
+                const newCountry={id:Date.now(),countryName,countryCode};
+                const arr=getData(KEYS.countries);arr.push(newCountry);saveData(KEYS.countries,arr);renderCountry(newCountry);countryForm.reset();window.showMessage('País guardado');
+            });
+
+            window.showTab('users');
+        });
+    </script>
+</body>
+</html>

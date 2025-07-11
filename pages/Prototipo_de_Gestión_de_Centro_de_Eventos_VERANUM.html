@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VERANUM - Gestión de Centro de Eventos</title>
+    <!-- Incluye Tailwind CSS para un diseño responsivo y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#60A5FA',
+                        dark: '#1F2937',
+                        light: '#F3F4F6',
+                        accent: '#EF4444',
+                        veranumGreen: '#34C759',
+                        veranumDarkGreen: '#2E865F',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: theme('colors.light');
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinea al inicio verticalmente */
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 960px; /* Ancho máximo para el contenido */
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: theme('borderRadius.lg');
+            padding: 2.5rem;
+            box-sizing: border-box;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            border: 1px solid theme('colors.gray.300');
+            border-radius: theme('borderRadius.md');
+            padding: 0.75rem 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s ease-in-out;
+        }
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: theme('colors.primary');
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: theme('borderRadius.md');
+            font-weight: theme('fontWeight.medium');
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold text-dark text-center mb-8">Gestión de Centro de Eventos VERANUM</h1>
+
+        <!-- Sección para añadir un nuevo centro de eventos -->
+        <div class="mb-10 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Añadir Nuevo Centro de Eventos</h2>
+            <form id="addEventCenterForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="eventCenterName" class="block text-gray-700 text-sm font-medium mb-2">Nombre del Centro</label>
+                    <input type="text" id="eventCenterName" name="eventCenterName" placeholder="Ej: Salón Pacífico" required>
+                </div>
+                <div>
+                    <label for="associatedHotel" class="block text-gray-700 text-sm font-medium mb-2">Hotel Asociado</label>
+                    <select id="associatedHotel" name="associatedHotel" required>
+                        <option value="">Selecciona un hotel</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="capacity" class="block text-gray-700 text-sm font-medium mb-2">Capacidad (personas)</label>
+                    <input type="number" id="capacity" name="capacity" min="1" value="50" required>
+                </div>
+                <div>
+                    <label for="hourlyPrice" class="block text-gray-700 text-sm font-medium mb-2">Precio por Hora (CLP)</label>
+                    <input type="number" id="hourlyPrice" name="hourlyPrice" min="0" step="1000" placeholder="Ej: 30000" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label for="eventCenterDescription" class="block text-gray-700 text-sm font-medium mb-2">Descripción</label>
+                    <textarea id="eventCenterDescription" name="eventCenterDescription" rows="3" placeholder="Detalles sobre el centro de eventos, equipamiento, etc."></textarea>
+                </div>
+                <div class="md:col-span-2 text-right">
+                    <button type="submit" class="bg-primary text-white py-2 px-6 hover:bg-secondary focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        Guardar Centro de Eventos
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección para mostrar la lista de centros de eventos -->
+        <div>
+            <h2 class="text-2xl font-semibold text-dark mb-4">Centros de Eventos Registrados</h2>
+            <div id="eventCenterList" class="space-y-4">
+                <!-- contenido dinámico -->
+            </div>
+        </div>
+
+        <!-- Sección para reservar un centro de eventos -->
+        <div class="mt-12 p-6 border border-gray-200 rounded-lg shadow-sm">
+            <h2 class="text-2xl font-semibold text-dark mb-4">Reservar Centro de Eventos</h2>
+            <form id="bookEventForm" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+                <div>
+                    <label for="selectCenter" class="block text-gray-700 text-sm font-medium mb-2">Centro</label>
+                    <select id="selectCenter" required class="w-full"></select>
+                </div>
+                <div>
+                    <label for="eventDate" class="block text-gray-700 text-sm font-medium mb-2">Fecha</label>
+                    <input type="date" id="eventDate" required class="w-full">
+                </div>
+                <div>
+                    <label for="slot" class="block text-gray-700 text-sm font-medium mb-2">Horario</label>
+                    <select id="slot" required class="w-full">
+                        <option value="AM">Mañana (08-14)</option>
+                        <option value="PM">Tarde (15-21)</option>
+                    </select>
+                </div>
+                <div class="md:col-span-3 flex space-x-4">
+                    <input type="text" id="clientName" placeholder="Nombre Cliente" class="flex-1 border rounded-md p-2" required>
+                    <input type="tel" id="clientPhone" placeholder="Teléfono" class="flex-1 border rounded-md p-2" required>
+                    <button type="submit" class="bg-veranumGreen text-white px-6 py-2 rounded-md hover:bg-veranumDarkGreen">Reservar</button>
+                </div>
+            </form>
+
+            <p id="bookingMsg" class="text-red-600 mt-4 hidden"></p>
+
+            <h3 class="text-xl font-semibold text-dark mt-8 mb-2">Disponibilidad (próximos 14 días)</h3>
+            <div class="overflow-x-auto">
+                <table id="calendarTable" class="min-w-full text-center border">
+                    <!-- se llena dinámicamente -->
+                </table>
+            </div>
+        </div>
+
+        <!-- Contenedor para mensajes (simulando un cuadro de diálogo) -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div class="bg-white rounded-lg p-6 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-medium mb-4 text-dark"></p>
+                <button onclick="window.hideMessage()" class="bg-primary text-white py-2 px-5 rounded-md hover:bg-secondary focus:outline-none">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Helpers de mensaje
+        window.showMessage = (msg)=>{const b=document.getElementById('messageBox');const t=document.getElementById('messageText');if(b&&t){t.innerText=msg;b.classList.remove('hidden')}};
+        window.hideMessage = ()=>document.getElementById('messageBox')?.classList.add('hidden');
+
+        // --- Persistencia Centros de Eventos ---
+        const STORAGE_KEY='VERANUM_EVENT_CENTERS';
+        const getCenters = ()=>JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+        const saveCenters = (arr)=>localStorage.setItem(STORAGE_KEY,JSON.stringify(arr));
+
+        // --- Persistencia Hoteles ---
+        const HOTEL_KEY = 'VERANUM_HOTELS';
+        const getHotels = () => JSON.parse(localStorage.getItem(HOTEL_KEY) || '[]');
+
+        // Estado de edición
+        let editingCenterId = null;
+
+        // Helpers UI
+        const refreshCenters = () => {
+            const list = document.getElementById('eventCenterList');
+            if (list) list.innerHTML = '';
+            getCenters().forEach(renderCenter);
+        };
+        const populateCenterSelect = () => {
+            const centerSelect = document.getElementById('selectCenter');
+            if (!centerSelect) return;
+            centerSelect.innerHTML = '';
+            getCenters().forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = `${c.name} - ${c.hotel}`;
+                centerSelect.appendChild(opt);
+            });
+        };
+
+        const renderCenter = (c)=>{
+            const list=document.getElementById('eventCenterList');
+            if(!list) return;
+            const html=`
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center mb-3" data-id="${c.id}">
+                    <div>
+                        <h3 class="text-lg font-semibold text-dark">${c.name} - ${c.hotel}</h3>
+                        <p class="text-gray-600 text-sm">Capacidad: ${c.capacity} personas | Precio/hora: CLP ${Number(c.price).toLocaleString('es-CL')}</p>
+                        <p class="text-gray-600 text-xs mt-1">Descripción: ${c.desc||'Sin descripción.'}</p>
+                    </div>
+                    <button class="edit-center mt-3 md:mt-0 bg-blue-100 text-primary py-1 px-4 rounded-md text-sm hover:bg-blue-200" data-id="${c.id}">Editar</button>
+                </div>`;
+            list.insertAdjacentHTML('afterbegin',html);
+        };
+
+        document.addEventListener('DOMContentLoaded',()=>{
+            // Poblar select de hoteles en el formulario
+            const hotelSelectForm = document.getElementById('associatedHotel');
+            const hotels = getHotels();
+            hotels.forEach(h=>{
+                const opt=document.createElement('option');
+                opt.value=h.hotelName;
+                opt.textContent=h.hotelName;
+                hotelSelectForm.appendChild(opt);
+            });
+
+            // Crear centro(s) de ejemplo si no existen
+            if(getCenters().length===0 && hotels.length>0){
+                const demoCenters = hotels.map((h,idx)=>({
+                    id: Date.now()+idx,
+                    name: `Centro ${h.hotelName}`,
+                    hotel: h.hotelName,
+                    capacity: 100,
+                    price: 50000,
+                    desc: 'Centro principal del hotel'
+                }));
+                saveCenters(demoCenters);
+            }
+
+            // Renderizar lista inicial & selects
+            refreshCenters();
+            populateCenterSelect();
+
+            const form=document.getElementById('addEventCenterForm');
+            const submitBtn = form?.querySelector('button[type="submit"]');
+            form?.addEventListener('submit',(e)=>{
+                e.preventDefault();
+                const name=document.getElementById('eventCenterName').value;
+                const hotel=document.getElementById('associatedHotel').value;
+                const capacity=parseInt(document.getElementById('capacity').value||0,10);
+                const price=parseFloat(document.getElementById('hourlyPrice').value||0);
+                const desc=document.getElementById('eventCenterDescription').value;
+
+                const arr=getCenters();
+                if(editingCenterId){
+                    const idx=arr.findIndex(c=>c.id===editingCenterId);
+                    if(idx>-1){arr[idx]={id:editingCenterId,name,hotel,capacity,price,desc};}
+                    editingCenterId=null;
+                    submitBtn.textContent='Guardar Centro de Eventos';
+                }else{
+                    arr.push({id:Date.now(),name,hotel,capacity,price,desc});
+                }
+                saveCenters(arr);
+                refreshCenters();
+                populateCenterSelect();
+                window.showMessage(`Centro de eventos "${name}" guardado.`);
+                form.reset();
+            });
+
+            // Delegación para botón Editar
+            document.getElementById('eventCenterList').addEventListener('click',(ev)=>{
+                const btn=ev.target;
+                if(!btn.classList.contains('edit-center')) return;
+                const id=parseInt(btn.dataset.id,10);
+                const center=getCenters().find(c=>c.id===id);
+                if(!center) return;
+                document.getElementById('eventCenterName').value=center.name;
+                document.getElementById('associatedHotel').value=center.hotel;
+                document.getElementById('capacity').value=center.capacity;
+                document.getElementById('hourlyPrice').value=center.price;
+                document.getElementById('eventCenterDescription').value=center.desc;
+                editingCenterId=id;
+                submitBtn.textContent='Guardar Cambios';
+            });
+
+            // --- Persistencia Reservas ---
+            const BOOK_KEY='VERANUM_EVENT_BOOKINGS';
+            const getBookings=()=>JSON.parse(localStorage.getItem(BOOK_KEY)||'[]');
+            const saveBookings=arr=>localStorage.setItem(BOOK_KEY,JSON.stringify(arr));
+            const isCenterAvailable=(cid,date,slot)=>getBookings().filter(b=>b.centerId===cid&&b.date===date&&b.slot===slot).length===0;
+
+            // Render calendario simple
+            const renderCalendar=(cid)=>{
+                const table=document.getElementById('calendarTable');
+                if(!table) return;
+                table.innerHTML='';
+                const header=`<tr class="bg-gray-100"><th class="border p-2">Fecha</th><th class="border p-2">Mañana</th><th class="border p-2">Tarde</th></tr>`;
+                table.insertAdjacentHTML('beforeend',header);
+                const today=new Date();
+                for(let i=0;i<14;i++){
+                    const d=new Date(today);d.setDate(d.getDate()+i);
+                    const dateStr=d.toISOString().split('T')[0];
+                    const row=`<tr>
+                        <td class="border p-1 text-sm">${dateStr}</td>
+                        ${['AM','PM'].map(sl=>{
+                            const free=isCenterAvailable(cid,dateStr,sl);
+                            const cls=free?'bg-green-100':'bg-red-200';
+                            return `<td class="border p-1 ${cls} text-xs">${free?'Libre':'Ocupado'}</td>`;
+                        }).join('')}
+                    </tr>`;
+                    table.insertAdjacentHTML('beforeend',row);
+                }
+            };
+
+            // Poblar select de centros
+            const centerSelect=document.getElementById('selectCenter');
+            getCenters().forEach(c=>{
+                const opt=document.createElement('option');opt.value=c.id;opt.textContent=`${c.name} - ${c.hotel}`;centerSelect.appendChild(opt);
+            });
+
+            // Mostrar calendario para el primer centro existente
+            if(centerSelect.value) renderCalendar(parseInt(centerSelect.value,10));
+
+            centerSelect.addEventListener('change',()=>{
+                renderCalendar(parseInt(centerSelect.value,10));
+            });
+
+            // Manejar reserva
+            const bookForm=document.getElementById('bookEventForm');
+            const msgP=document.getElementById('bookingMsg');
+            bookForm?.addEventListener('submit',(e)=>{
+                e.preventDefault();
+                msgP.classList.add('hidden');
+                const cid=parseInt(centerSelect.value,10);
+                const date=document.getElementById('eventDate').value;
+                const slot=document.getElementById('slot').value;
+                const client=document.getElementById('clientName').value;
+                const phone=document.getElementById('clientPhone').value;
+                if(!isCenterAvailable(cid,date,slot)){
+                    msgP.textContent='Ese centro ya está reservado para la fecha y horario seleccionados.';
+                    msgP.classList.remove('hidden');
+                    return;
+                }
+                const newBk={id:Date.now(),centerId:cid,date,slot,client,phone};
+                const arr=getBookings();arr.push(newBk);saveBookings(arr);
+                window.showMessage('Reserva creada exitosamente.');
+                bookForm.reset();
+                renderCalendar(cid);
+            });
+        });
+    </script>
+</body>
+</html>
