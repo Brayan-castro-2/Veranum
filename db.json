@@ -1,0 +1,34 @@
+{
+  "hotels": [
+    {
+      "id": 1,
+      "hotelName": "VERANUM Santiago",
+      "hotelLocation": "Santiago, Chile",
+      "roomCount": 120,
+      "extraServices": "Piscina, Gimnasio, Restaurante Gourmet",
+      "description": "Ubicado en el centro de Santiago, perfecto para viajes de negocios y turismo."
+    },
+    {
+      "id": 2,
+      "hotelName": "VERANUM V Región",
+      "hotelLocation": "Viña del Mar, Chile",
+      "roomCount": 80,
+      "extraServices": "Spa, Playa privada, Restaurante con vista al mar",
+      "description": "Un refugio costero con vistas inigualables del Pacífico."
+    }
+  ],
+  "promotions": [
+    {
+      "id": 1,
+      "promoName": "Verano 2x1",
+      "discountType": "percentage",
+      "discountValue": 50,
+      "validFrom": "2025-01-01",
+      "validTo": "2025-03-31",
+      "appliesToHotel": "VERANUM V Región",
+      "approved": true
+    }
+  ],
+  "event_centers": [],
+  "users": []
+}

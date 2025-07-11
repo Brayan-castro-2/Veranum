@@ -1,0 +1,12 @@
+{
+  "name": "veranum-prototype",
+  "version": "1.0.0",
+  "description": "Prototipo plataforma hotelera VERANUM (frontend estático + json-server)",
+  "scripts": {
+    "api": "json-server --watch db.json --port 3000",
+    "seed": "node seed.js"
+  },
+  "devDependencies": {
+    "json-server": "^0.17.3"
+  }
+}

@@ -91,30 +91,30 @@
         </div>
     </footer>
     <script>
-        document.addEventListener('DOMContentLoaded',()=>{
-            const HOTEL_KEY='VERANUM_HOTELS';
-            const PROMO_KEY='VERANUM_PROMOTIONS';
-            const CENTER_KEY='VERANUM_EVENT_CENTERS';
+        document.addEventListener('DOMContentLoaded', async () => {
+            const API = 'http://localhost:3000';
 
-            const getHotels=()=>JSON.parse(localStorage.getItem(HOTEL_KEY)||'[]');
-            const getPromos=()=>JSON.parse(localStorage.getItem(PROMO_KEY)||'[]');
-            const getCenters=()=>JSON.parse(localStorage.getItem(CENTER_KEY)||'[]');
+            const fetchJSON = (url) => fetch(url).then(r => r.json());
 
-            const updateNavCounts=()=>{
-                const h=getHotels().length;
-                const p=getPromos().filter(pr=>pr.approved).length;
-                const c=getCenters().length;
-                const hA=document.getElementById('navHotels');
-                const pA=document.getElementById('navPromos');
-                const cA=document.getElementById('navCenters');
-                if(hA) hA.textContent=`Hoteles (${h})`;
-                if(pA) pA.textContent=`Promociones (${p})`;
-                if(cA) cA.textContent=`Centro de Eventos (${c})`;
+            const updateNavCounts = async () => {
+                try {
+                    const [hotels, promos, centers] = await Promise.all([
+                        fetchJSON(`${API}/hotels`),
+                        fetchJSON(`${API}/promotions`),
+                        fetchJSON(`${API}/event_centers`)
+                    ]);
+                    const hA = document.getElementById('navHotels');
+                    const pA = document.getElementById('navPromos');
+                    const cA = document.getElementById('navCenters');
+                    if(hA) hA.textContent = `Hoteles (${hotels.length})`;
+                    if(pA) pA.textContent = `Promociones (${promos.filter(pr=>pr.approved).length})`;
+                    if(cA) cA.textContent = `Centro de Eventos (${centers.length})`;
+                } catch (err) { console.error(err); }
             };
 
             const hotelCardList=document.getElementById('hotelCardList');
 
-            const renderHotelCard = (h)=>{
+            const renderHotelCard = (h) => {
                 if(!hotelCardList) return;
                 const imgPlaceholder = `https://placehold.co/600x400/4CAF50/ffffff?text=${encodeURIComponent(h.hotelName)}`;
                 const html=`
@@ -135,18 +135,14 @@
                 hotelCardList.insertAdjacentHTML('beforeend',html);
             };
 
-            const refreshHotelList = ()=>{
-                if(hotelCardList) hotelCardList.innerHTML='';
-                getHotels().forEach(renderHotelCard);
+            const refreshHotelList = async () => {
+                if (hotelCardList) hotelCardList.innerHTML = '';
+                const hotels = await fetchJSON(`${API}/hotels`);
+                hotels.forEach(renderHotelCard);
             };
 
-            updateNavCounts();
-            refreshHotelList();
-
-            window.addEventListener('storage',e=>{
-                if([HOTEL_KEY,PROMO_KEY,CENTER_KEY].includes(e.key)) updateNavCounts();
-                if(e.key===HOTEL_KEY) refreshHotelList();
-            });
+            await updateNavCounts();
+            await refreshHotelList();
         });
     </script>
 </body>
